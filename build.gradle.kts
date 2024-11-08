@@ -1,13 +1,55 @@
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
     java
+    signing
+    id("com.vanniktech.maven.publish") version "0.30.0"
 }
 
 group = "io.codef.api"
-version = "2.0.0-ALPHA-01"
+version = "2.0.0-ALPHA-001"
 
 repositories {
     mavenCentral()
 }
+
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+
+    pom {
+        name = "easycodef-java-v2"
+        description = "Advanced EasyCodef Library for JDK"
+        inceptionYear = "2024"
+        url = "https://api.codef.io"
+
+        licenses {
+            license {
+                name = "The Apache License, Version 2.0"
+                url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                distribution = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+            }
+        }
+        developers {
+            developer {
+                id = "happybean"
+                name = "Haebin Byeon"
+                email = "happybean@hecto.co.kr"
+            }
+        }
+
+        scm {
+            connection = "scm:git:git://github.com/codef-io/easycodef-java-v2.git"
+            developerConnection = "scm:git:ssh://github.com/codef-io/easycodef-java-v2.git"
+            url = "https://github.com/codef-io/easycodef-java-v2.git"
+        }
+
+        issueManagement {
+            system = "GitHub"
+            url = "https://github.com/codef-io/easycodef-java-v2/issues"
+        }
+    }
+}
+
 
 dependencies {
 
@@ -40,16 +82,19 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.3")
 }
 
+
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
-tasks.withType<JavaCompile>().configureEach {
-    options.compilerArgs.add("-Xlint:all")
+tasks.test {
+    useJUnitPlatform()
 }
 
-tasks.named<Test>("test") {
-    useJUnitPlatform()
+tasks.register("printVersion") {
+    doLast {
+        println(project.version)
+    }
 }

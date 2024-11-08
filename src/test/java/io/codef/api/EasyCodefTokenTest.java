@@ -9,5 +9,6 @@ public class EasyCodefTokenTest {
 
     @Test
     public void usageExample() {
+
     }
 }
