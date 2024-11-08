@@ -1,13 +1,68 @@
+import com.vanniktech.maven.publish.JavaLibrary
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
     java
+    signing
+    id("com.vanniktech.maven.publish") version "0.30.0"
 }
 
+
 group = "io.codef.api"
-version = "2.0.0-ALPHA-01"
+version = "2.0.0-alpha+001"
+
+signing {
+    useInMemoryPgpKeys(
+        System.getenv("GPG_PRIVATE_KEY"),
+        System.getenv("GPG_PASSPHRASE")
+    )
+    sign(publishing.publications)
+}
 
 repositories {
     mavenCentral()
 }
+
+mavenPublishing {
+    configure(JavaLibrary(JavadocJar.Javadoc(), true))
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+
+    coordinates("io.codef.api", "easycodef-java-v2", version.toString())
+    pom {
+        url = "api.codef.io"
+        name = "easycodef-java-v2"
+        description = "Advanced EasyCodef Library for Java"
+        inceptionYear = "2024"
+
+        licenses {
+            license {
+                name = "MIT License"
+                url = "https://opensource.org/licenses/MIT"
+                distribution = "https://opensource.org/licenses/MIT"
+            }
+        }
+        developers {
+            developer {
+                id = "happybean"
+                name = "Haebin Byeon"
+                email = "happybean@hecto.co.kr"
+            }
+        }
+
+        scm {
+            connection = "scm:git:git@github.com:codef-io/easycodef-java-v2.git"
+            developerConnection = "scm:git:ssh://github.com/codef-io/easycodef-java-v2.git"
+            url = "https://github.com/codef-io/easycodef-java-v2"
+        }
+
+        issueManagement {
+            system = "GitHub"
+            url = "https://github.com/codef-io/easycodef-java-v2/issues"
+        }
+    }
+}
+
 
 dependencies {
 
@@ -40,16 +95,19 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.3")
 }
 
+
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
-tasks.withType<JavaCompile>().configureEach {
-    options.compilerArgs.add("-Xlint:all")
+tasks.test {
+    useJUnitPlatform()
 }
 
-tasks.named<Test>("test") {
-    useJUnitPlatform()
+tasks.register("printVersion") {
+    doLast {
+        println(project.version)
+    }
 }

@@ -1,6 +1,11 @@
 package io.codef.api;
 
+import java.io.Serial;
+
 public class CodefException extends RuntimeException {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private static final String LOG_WITH_CAUSE_FORMAT = "%s\n→ %s\n\n";
 

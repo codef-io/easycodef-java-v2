@@ -1,0 +1,55 @@
+name: Publish to Maven Central Repository
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Extract version from build.gradle.kts
+        id: get_version
+        run: echo "::set-output name=VERSION::$(./gradlew -q printVersion)"
+
+      - name: Create Git tag
+        env:
+          VERSION: ${{ steps.get_version.outputs.VERSION }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "v${VERSION}" -m "Release version ${VERSION}"
+          git push --force origin "v${VERSION}"
+
+      - name: Set up GPG
+        run: |
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+          gpg-connect-agent reloadagent /bye
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Configure gradle-wrapper.properties
+        run: |
+          echo "mavenCentralUsername=${{ secrets.OSSRH_USERNAME }}" >> gradle.properties
+          echo "mavenCentralPassword=${{ secrets.OSSRH_PASSWORD }}" >> gradle.properties
+
+      - name: Publish to Maven Central
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+        run: |
+          ./gradlew publishAllPublicationsToMavenCentralRepository --stacktrace --debug
