@@ -23,6 +23,28 @@
 [![Last Commit](https://img.shields.io/github/last-commit/codef-io/easycodef-java-v2/master?style=for-the-badge&label=LAST%20BUILD&logo=Github&color=181717)](https://github.com/codef-io/easycodef-java-v2)<br>
 [![Maven Central](https://img.shields.io/maven-central/v/io.codef.api/easycodef-java-v2.svg?style=for-the-badge&label=Maven%20Central&logo=apache-maven&color=C71A36)](https://central.sonatype.com/artifact/io.codef.api/easycodef-java-v2)<br>
 
+
+### Snippets
+
+- Gradle(Kotlin)
+    ```gradle
+    implementation("io.codef.api:easycodef-java-v2:2.0.0-alpha-002")
+    ```
+  
+- Gradle(short)
+    ```gradle
+    implementation 'io.codef.api:easycodef-java-v2:2.0.0-alpha-002'
+    ```
+  
+- Maven
+    ```xml
+    <dependency>
+        <groupId>io.codef.api</groupId>
+        <artifactId>easycodef-java-v2</artifactId>
+        <version>2.0.0-alpha-002</version>
+    </dependency>
+    ```
+
 ## LISENCE
 
 <img alt="헥토데이터" src="https://github.com/user-attachments/assets/ac6b7a7d-33f1-4b1e-9fbb-8231d56e7f33" width="100">
