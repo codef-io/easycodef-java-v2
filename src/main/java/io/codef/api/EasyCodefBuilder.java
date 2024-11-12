@@ -1,5 +1,9 @@
 package io.codef.api;
 
+import io.codef.api.constants.EasyCodefClientType;
+import io.codef.api.error.CodefError;
+import io.codef.api.error.CodefException;
+
 import java.util.UUID;
 
 public class EasyCodefBuilder {

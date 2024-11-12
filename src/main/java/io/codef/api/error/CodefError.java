@@ -1,4 +1,6 @@
-package io.codef.api;
+package io.codef.api.error;
+
+import io.codef.api.constants.EasyCodefReferenceUrl;
 
 public enum CodefError {
     INVALID_CLIENT_ID(
@@ -40,6 +42,14 @@ public enum CodefError {
     OAUTH_CONNECTION_ERROR(
             "The connection to the OAUTH server failed. Please check if `https://oauth.codef.io` is accessible.",
             EasyCodefReferenceUrl.DEV_GUIDE_REST_API
+    ),
+    RSA_ENCRYPTION_ERROR(
+            "An error occurred on RSA Encryption. Please check your publicKey",
+            EasyCodefReferenceUrl.KEY
+    ),
+    NEED_TO_SECURE_WITH_METHOD(
+            "To encrypt the parameters, you must call the following method: EasyCodefRequestBuilder.builder().secureWith(easyCodef).",
+            EasyCodefReferenceUrl.GITHUB
     );
 
     private final String message;

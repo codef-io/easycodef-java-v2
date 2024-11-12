@@ -1,4 +1,4 @@
-package io.codef.api;
+package io.codef.api.constants;
 
 public enum EasyCodefClientType {
     API("https://api.codef.io"),

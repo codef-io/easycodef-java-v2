@@ -9,9 +9,12 @@ public class EasyCodefToken {
      private LocalDateTime expiresAt;
 
     protected EasyCodefToken(EasyCodefBuilder builder) {
-        String combinedKey = String.join(":", builder.getClientId().toString(), builder.getClientSecret().toString());
+        final int VALIDITY_PERIOD_DAYS = 7;
+        final String DELIMITER = ":";
+
+        String combinedKey = String.join(DELIMITER, builder.getClientId().toString(), builder.getClientSecret().toString());
         this.oauthToken = Base64.getEncoder().encodeToString(combinedKey.getBytes());
         this.accessToken = EasyCodefConnector.issueToken(oauthToken);
-        this.expiresAt = LocalDateTime.now();
+        this.expiresAt = LocalDateTime.now().plusDays(VALIDITY_PERIOD_DAYS);
     }
 }
