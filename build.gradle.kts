@@ -73,6 +73,11 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.1")
 
     /**
+     * 2024-10-17 Latest
+     */
+    implementation("com.alibaba:fastjson:2.0.53")
+
+    /**
      * 2024-06-12 Latest
      * https://mvnrepository.com/artifact/commons-codec/commons-codec
      */
