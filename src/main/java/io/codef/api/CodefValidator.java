@@ -3,7 +3,7 @@ package io.codef.api;
 import java.util.Optional;
 import java.util.UUID;
 
-public class CodefValidator {
+final class CodefValidator {
 
     private CodefValidator() {
     }

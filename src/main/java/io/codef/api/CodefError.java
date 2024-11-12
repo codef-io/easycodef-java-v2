@@ -13,8 +13,24 @@ public enum CodefError {
             "publicKey is required and cannot be null.",
             EasyCodefReferenceUrl.KEY
     ),
+    NULL_CLIENT_ID(
+            "clientId is required and cannot be null.",
+            EasyCodefReferenceUrl.KEY
+    ),
+    NULL_CLIENT_SECRET(
+            "clientSecret is required and cannot be null.",
+            EasyCodefReferenceUrl.KEY
+    ),
+    NULL_PUBLIC_KEY(
+            "publicKey is required and cannot be null.",
+            EasyCodefReferenceUrl.KEY
+    ),
+    NULL_CLIENT_TYPE(
+            "clientType is required and cannot be null.",
+            EasyCodefReferenceUrl.KEY
+    ),
     OAUTH_UNAUTHORIZED(
-            "Failed to authenticate with the Codef OAuth server. Please verify your clientId and clientSecret values.",
+            "Failed to authenticate with the Codef OAuth server (401 Unauthorized). Please verify your clientId and clientSecret values.",
             EasyCodefReferenceUrl.KEY
     ),
     OAUTH_INTERNAL_ERROR(

@@ -1,16 +1,16 @@
 package io.codef.api;
 
-
 public class EasyCodef {
-
-    private EasyCodefToken easyCodefToken;
-    private EasyCodefProperty property;
+    private final String publicKey;
+    private final EasyCodefClientType clientType;
+    private final EasyCodefToken easyCodefToken;
 
     protected EasyCodef(
-            EasyCodefToken easyCodefToken,
-            EasyCodefProperty property
+            EasyCodefBuilder builder,
+            EasyCodefToken easyCodefToken
     ) {
+        this.clientType = builder.getClientType();
+        this.publicKey = builder.getPublicKey();
         this.easyCodefToken = easyCodefToken;
-        this.property = property;
     }
 }
