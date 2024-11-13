@@ -7,9 +7,9 @@
   </a>
 <br>
 
----
+<h1 align="center">EasyCodef Java V2</h1>
 
-# EasyCodef Java V2
+<br>
 
 `easycodef-java-v2`는 codef API를 JDK 환경에서 더욱 더 편리하게 연동할 수 있도록 돕는 오픈소스 라이브러리입니다.
 
