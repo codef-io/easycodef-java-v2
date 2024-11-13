@@ -1,3 +1,5 @@
+<h1 align="center">EasyCodef Java V2</h1>
+<br>
 <p align="center">
   <a title="코드에프" href="https://codef.io/">
     <picture>
@@ -5,9 +7,7 @@
       <img alt="코드에프" src="https://github.com/user-attachments/assets/d83f0450-d84e-4594-8fc0-ed08a1d05390" width="250">
     </picture>
   </a>
-<br>
-
-<h1 align="center">EasyCodef Java V2</h1>
+</p>
 
 <br>
 
