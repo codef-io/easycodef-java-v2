@@ -1,4 +1,4 @@
-<h1 align="center">EasyCodef Java V2</h1>
+<br>
 <br>
 <p align="center">
   <a title="코드에프" href="https://codef.io/">
@@ -11,71 +11,37 @@
 
 <br>
 
-`easycodef-java-v2`는 codef API를 JDK 환경에서 더욱 더 편리하게 연동할 수 있도록 돕는 오픈소스 라이브러리입니다.
+<p align="center">
+  <span><code>easycodef-java-v2</code> - Open-Source library<br>With the <b>CODEF API</b> in a JDK environment</span>
+</p>
 
-현재 알파 버전 개발중으로 v2.0.0-ALPHA-002 버전으로 Maven Central Repository를 통해 배포중입니다.
+<br>
 
-2024년 상반기 실제 고객사 대상으로 릴리즈 예정입니다.
+<p align="center">
+  <a href="https://github.com/codef-io/easycodef-java-v2/actions?query=branch%3Amaster"><img align="center" src="https://img.shields.io/github/actions/workflow/status/codef-io/easycodef-java-v2/publish.yml?style=for-the-badge&logo=gradle&color=02303A" alt="Build Status"/></a>
+  <a href="https://github.com/codef-io/easycodef-java-v2"><img align="center"  src="https://img.shields.io/github/last-commit/codef-io/easycodef-java-v2/master?style=for-the-badge&label=LAST%20BUILD&logo=Github&color=181717" alt="Last Commit"/></a>
+  <a href="https://central.sonatype.com/artifact/io.codef.api/easycodef-java-v2"><img align="center"  src="https://img.shields.io/maven-central/v/io.codef.api/easycodef-java-v2.svg?style=for-the-badge&label=Maven%20Central&logo=apache-maven&color=C71A36" alt="Maven Central"/></a>
+</p>
 
-<br><br>
 
-## Release
+<br><br><br>
 
-[![Build Status](https://img.shields.io/github/actions/workflow/status/codef-io/easycodef-java-v2/publish.yml?style=for-the-badge&logo=gradle&color=02303A)](https://github.com/codef-io/easycodef-java-v2/actions?query=branch%3Amaster)<br>
-[![Last Commit](https://img.shields.io/github/last-commit/codef-io/easycodef-java-v2/master?style=for-the-badge&label=LAST%20BUILD&logo=Github&color=181717)](https://github.com/codef-io/easycodef-java-v2)<br>
-[![Maven Central](https://img.shields.io/maven-central/v/io.codef.api/easycodef-java-v2.svg?style=for-the-badge&label=Maven%20Central&logo=apache-maven&color=C71A36)](https://central.sonatype.com/artifact/io.codef.api/easycodef-java-v2)<br>
+### EasyCodef V2 For Java
+- **[EasyCodef V2 Wiki](https://github.com/codef-io/easycodef-java-v2/wiki)<br><br>**
+- [Codef Homepage](https://codef.io/)
+- [Codef API Developer Guide](https://developer.codef.io/)
+- [Hectodata Homepage](https://hectodata.co.kr/)
+- [Hecto Tech Blog](https://blog.hectodata.co.kr/)
 
-## Snippets
-
-- Gradle(Kotlin)
-    ```gradle
-    implementation("io.codef.api:easycodef-java-v2:2.0.0-alpha-003")
-    ```
-  
-- Gradle(short)
-    ```gradle
-    implementation 'io.codef.api:easycodef-java-v2:2.0.0-alpha-003'
-    ```
-  
-- Maven
-    ```xml
-    <dependency>
-        <groupId>io.codef.api</groupId>
-        <artifactId>easycodef-java-v2</artifactId>
-        <version>2.0.0-alpha-003</version>
-    </dependency>
-    ```
-
-## Get It !
-
-- 예제 코드
-  ```java
-  EasyCodef easyCodef = EasyCodefBuilder.builder()
-          .clientType(CodefClientType.DEMO)
-          .clientId("your-client-id")
-          .clientSecret("your-client-secret")
-          .publicKey("your-public-key")
-          .build();
-  
-  EasyCodefRequest request = EasyCodefRequestBuilder.builder()
-          .path("/v1/kr/public/hw/nip-cdc-list/my-vaccination")
-          .organization("0011")
-          .requestBody("loginType", "1")
-          .requestBody("userId", "your-nhis-id")
-          .secureRequestBody("userPassword", "your-nhis-password")
-          .secureWith(easyCodef)
-          .build();
-  
-  EasyCodefResponse easyCodefResponse = easyCodef.requestProduct(request);
-  
-  final EasyCodefResponse.Result result = easyCodefResponse.result();
-  final Object data = easyCodefResponse.data();
-  ```
+<br>
 
 ---
+
+<br>
 
 <p align="center">
 <img alt="헥토데이터" src="https://github.com/user-attachments/assets/ac6b7a7d-33f1-4b1e-9fbb-8231d56e7f33" height="20"><br>
 <span>MIT © | <a href="https://github.com/codef-io/easycodef-java-v2/blob/master/LICENSE" target="_blank">LICENSE</a></span>
 </p>
 
+<br>
