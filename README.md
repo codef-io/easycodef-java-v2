@@ -29,12 +29,12 @@
 
 - Gradle(Kotlin)
     ```gradle
-    implementation("io.codef.api:easycodef-java-v2:2.0.0-alpha-002")
+    implementation("io.codef.api:easycodef-java-v2:2.0.0-alpha-003")
     ```
   
 - Gradle(short)
     ```gradle
-    implementation 'io.codef.api:easycodef-java-v2:2.0.0-alpha-002'
+    implementation 'io.codef.api:easycodef-java-v2:2.0.0-alpha-003'
     ```
   
 - Maven
@@ -42,7 +42,7 @@
     <dependency>
         <groupId>io.codef.api</groupId>
         <artifactId>easycodef-java-v2</artifactId>
-        <version>2.0.0-alpha-002</version>
+        <version>2.0.0-alpha-003</version>
     </dependency>
     ```
 
