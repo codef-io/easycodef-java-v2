@@ -17,6 +17,8 @@
 
 2024년 상반기 실제 고객사 대상으로 릴리즈 예정입니다.
 
+<br><br>
+
 ## Release
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/codef-io/easycodef-java-v2/publish.yml?style=for-the-badge&logo=gradle&color=02303A)](https://github.com/codef-io/easycodef-java-v2/actions?query=branch%3Amaster)<br>
