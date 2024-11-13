@@ -74,6 +74,14 @@ public enum CodefError {
     INTERNAL_SERVER_ERROR(
             "An error occurred on your request.",
             CodefReferenceUrl.DEV_GUIDE_REST_API
+    ),
+    PARSE_ERROR(
+            "An exception occurred because the client could not parse the server response in the expected format, possibly due to incorrect headers or body format.",
+            CodefReferenceUrl.TECH_INQUIRY
+    ),
+    IO_ERROR(
+            "An error occurred because the request was either not sent properly or not received. Please check if the outbound port to IP: 211.55.34.5, PORT: 443 is open.",
+            CodefReferenceUrl.TECH_INQUIRY
     );
 
     private final String message;
@@ -92,4 +100,4 @@ public enum CodefError {
     public String getMessage() {
         return String.format(MESSAGE_FORMAT, message, referenceUrl.getUrl());
     }
-}
+    }

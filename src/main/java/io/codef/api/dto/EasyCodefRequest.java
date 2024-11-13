@@ -7,7 +7,7 @@ import static org.apache.hc.client5.http.auth.StandardAuthScheme.BEARER;
 
 public record EasyCodefRequest(
         String path,
-        HashMap<String, Object> requestParams
+        HashMap<String, Object> requestBody
 ) {
     /**
      * Header Format Constants
