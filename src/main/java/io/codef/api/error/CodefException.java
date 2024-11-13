@@ -1,4 +1,4 @@
-package io.codef.api;
+package io.codef.api.error;
 
 import java.io.Serial;
 

@@ -1,12 +1,16 @@
 package io.codef.api;
 
+import io.codef.api.constants.CodefClientType;
+import io.codef.api.error.CodefError;
+import io.codef.api.error.CodefException;
+
 import java.util.UUID;
 
 public class EasyCodefBuilder {
     private String publicKey;
     private UUID clientId;
     private UUID clientSecret;
-    private EasyCodefClientType clientType;
+    private CodefClientType clientType;
 
     public static EasyCodefBuilder builder() {
         return new EasyCodefBuilder();
@@ -27,7 +31,7 @@ public class EasyCodefBuilder {
         return this;
     }
 
-    public EasyCodefBuilder clientType(EasyCodefClientType clientType) {
+    public EasyCodefBuilder clientType(CodefClientType clientType) {
         this.clientType = clientType;
         return this;
     }
@@ -69,7 +73,7 @@ public class EasyCodefBuilder {
         return clientSecret;
     }
 
-    protected EasyCodefClientType getClientType() {
+    protected CodefClientType getClientType() {
         return clientType;
     }
 }

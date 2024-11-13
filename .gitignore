@@ -41,3 +41,4 @@ out
 test-output
 atlassian-ide-plugin.xml
 .gradletasknamecache
+/src/test/java/io/codef/api/EasyCodefTokenTest.java
