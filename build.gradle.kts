@@ -10,7 +10,7 @@ plugins {
 
 
 group = "io.codef.api"
-version = "2.0.0-alpha-002"
+version = "2.0.0-alpha-003"
 
 signing {
     useInMemoryPgpKeys(
@@ -71,6 +71,11 @@ dependencies {
      * https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
      */
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.1")
+
+    /**
+     * 2024-10-17 Latest
+     */
+    implementation("com.alibaba:fastjson:2.0.53")
 
     /**
      * 2024-06-12 Latest

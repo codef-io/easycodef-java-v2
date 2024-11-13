@@ -1,9 +1,12 @@
 package io.codef.api;
 
+import io.codef.api.error.CodefError;
+import io.codef.api.error.CodefException;
+
 import java.util.Optional;
 import java.util.UUID;
 
-public class CodefValidator {
+final class CodefValidator {
 
     private CodefValidator() {
     }

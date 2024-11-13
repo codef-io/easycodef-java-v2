@@ -1,26 +1,32 @@
 package io.codef.api;
 
+import java.time.LocalDateTime;
 import java.util.Base64;
 
 public class EasyCodefToken {
+     private final String oauthToken;
+     private String accessToken;
+     private LocalDateTime expiresAt;
 
-    private String codefOAuthToken;
-    private String codefAccessToken;
-    private EasyCodefServiceType serviceType;
+    protected EasyCodefToken(EasyCodefBuilder builder) {
+        final int VALIDITY_PERIOD_DAYS = 7;
+        final String DELIMITER = ":";
 
-    private EasyCodefToken(
-            EasyCodefProperty property
-    ) {
-        this.codefOAuthToken = generateBase64OAuthToken(property);
-        this.codefAccessToken = EasyCodefConnector.issueToken(codefOAuthToken);
+        String combinedKey = String.join(DELIMITER, builder.getClientId().toString(), builder.getClientSecret().toString());
+        this.oauthToken = Base64.getEncoder().encodeToString(combinedKey.getBytes());
+        this.accessToken = EasyCodefConnector.issueToken(oauthToken);
+        this.expiresAt = LocalDateTime.now().plusDays(VALIDITY_PERIOD_DAYS);
     }
 
-    protected static EasyCodefToken of(EasyCodefProperty property) {
-        return new EasyCodefToken(property);
+    public EasyCodefToken validateAndRefreshToken() {
+        if (expiresAt.isBefore(LocalDateTime.now().plusHours(24))) {
+            this.accessToken = EasyCodefConnector.issueToken(oauthToken);
+            this.expiresAt = LocalDateTime.now().plusDays(7);
+        }
+        return this;
     }
 
-    private static String generateBase64OAuthToken(EasyCodefProperty property) {
-        String combinedKey = property.getCombinedKey();
-        return Base64.getEncoder().encodeToString(combinedKey.getBytes());
+    public String getAccessToken() {
+        return accessToken;
     }
 }
