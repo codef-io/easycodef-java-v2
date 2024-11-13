@@ -17,4 +17,16 @@ public class EasyCodefToken {
         this.accessToken = EasyCodefConnector.issueToken(oauthToken);
         this.expiresAt = LocalDateTime.now().plusDays(VALIDITY_PERIOD_DAYS);
     }
+
+    public EasyCodefToken validateAndRefreshToken() {
+        if (expiresAt.isBefore(LocalDateTime.now().plusHours(24))) {
+            this.accessToken = EasyCodefConnector.issueToken(oauthToken);
+            this.expiresAt = LocalDateTime.now().plusDays(7);
+        }
+        return this;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
 }

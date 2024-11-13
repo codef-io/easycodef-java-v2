@@ -1,12 +1,8 @@
 package io.codef.api.dto;
 
-import com.alibaba.fastjson2.JSONObject;
-
-import java.util.HashMap;
-
 public record EasyCodefResponse(
         Result result,
-        JSONObject data
+        Object data
 ) {
 
     public record Result(
@@ -15,9 +11,5 @@ public record EasyCodefResponse(
             String message,
             String transactionId
     ) {
-    }
-
-    public HashMap<String, Object> getData() {
-        return new HashMap<>(data);
     }
 }

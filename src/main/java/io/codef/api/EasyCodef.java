@@ -1,6 +1,6 @@
 package io.codef.api;
 
-import io.codef.api.constants.EasyCodefClientType;
+import io.codef.api.constants.CodefClientType;
 import io.codef.api.dto.EasyCodefRequest;
 import io.codef.api.dto.EasyCodefResponse;
 import io.codef.api.util.RsaUtil;
@@ -9,7 +9,7 @@ import java.security.PublicKey;
 
 public class EasyCodef {
     private final PublicKey publicKey;
-    private final EasyCodefClientType clientType;
+    private final CodefClientType clientType;
     private final EasyCodefToken easyCodefToken;
 
     protected EasyCodef(
@@ -23,9 +23,12 @@ public class EasyCodef {
 
     public EasyCodefResponse requestProduct(
             EasyCodefRequest request,
-            String endpoint
+            String path
     ) {
-        return EasyCodefConnector.requestProduct(request, endpoint, clientType);
+        final String requestUrl = clientType.getHost() + path;
+        final EasyCodefToken easyCodefToken = this.easyCodefToken.validateAndRefreshToken();
+
+        return EasyCodefConnector.requestProduct(request, easyCodefToken, requestUrl);
     }
 
     public PublicKey getPublicKey() {

@@ -22,6 +22,11 @@ public class EasyCodefRequestBuilder {
         return new EasyCodefRequestBuilder();
     }
 
+    public EasyCodefRequestBuilder organization(Object value) {
+        generalRequestBody.put("organization", value);
+        return this;
+    }
+
     public EasyCodefRequestBuilder requestBody(
             String param,
             Object value

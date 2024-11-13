@@ -1,13 +1,13 @@
 package io.codef.api.constants;
 
-public enum EasyCodefReferenceUrl {
+public enum CodefReferenceUrl {
     KEY("https://codef.io/account/keys"),
     DEV_GUIDE_REST_API("https://developer.codef.io/common-guide/rest-api"),
     GITHUB("https://github.com/codef-io/easycodef-java-v2");
 
     private final String url;
 
-    EasyCodefReferenceUrl(String url) {
+    CodefReferenceUrl(String url) {
         this.url = url;
     }
 
