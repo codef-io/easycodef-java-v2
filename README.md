@@ -5,6 +5,8 @@
       <img alt="코드에프" src="https://github.com/user-attachments/assets/d83f0450-d84e-4594-8fc0-ed08a1d05390" width="250">
     </picture>
   </a>
+<br><br>
+<h3 align="center">MIT © | <a href="https://github.com/codef-io/easycodef-java-v2/blob/master/LICENSE" target="_blank">LICENSE</a></h3>
 </p>
 
 <br>
@@ -19,12 +21,13 @@
 
 ## Release
 
-<a href="https://central.sonatype.com/artifact/io.codef.api/easycodef-java-v2"/><img src=https://github.com/user-attachments/assets/91bc4d3d-c971-43d8-b6a1-2798c68d82eb width="100px"></a><br><br>
+<br>
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/codef-io/easycodef-java-v2/publish.yml?style=for-the-badge&logo=gradle&color=02303A)](https://github.com/codef-io/easycodef-java-v2/actions?query=branch%3Amaster)<br>
 [![Last Commit](https://img.shields.io/github/last-commit/codef-io/easycodef-java-v2/master?style=for-the-badge&label=LAST%20BUILD&logo=Github&color=181717)](https://github.com/codef-io/easycodef-java-v2)<br>
 [![Maven Central](https://img.shields.io/maven-central/v/io.codef.api/easycodef-java-v2.svg?style=for-the-badge&label=Maven%20Central&logo=apache-maven&color=C71A36)](https://central.sonatype.com/artifact/io.codef.api/easycodef-java-v2)<br>
 
+<a href="https://central.sonatype.com/artifact/io.codef.api/easycodef-java-v2"/><img src=https://github.com/user-attachments/assets/07a261f5-dad1-400a-bf8a-5e493e254f17 width="300px"></a><br><br>
 
 ### Snippets
 
@@ -73,8 +76,10 @@
   final Object data = easyCodefResponse.data();
   ```
 
-## LISENCE
+---
 
-<img alt="헥토데이터" src="https://github.com/user-attachments/assets/ac6b7a7d-33f1-4b1e-9fbb-8231d56e7f33" width="100">
+<p align="center">
+<img alt="헥토데이터" src="https://github.com/user-attachments/assets/ac6b7a7d-33f1-4b1e-9fbb-8231d56e7f33" height="20"><br>
+<span>MIT © | <a href="https://github.com/codef-io/easycodef-java-v2/blob/master/LICENSE" target="_blank">LICENSE</a></span>
+</p>
 
-MIT © Hectodata Co,. Ltd [LICENSE](https://github.com/codef-io/easycodef-java-v2/blob/master/LICENSE) 파일을 참고하세요.
