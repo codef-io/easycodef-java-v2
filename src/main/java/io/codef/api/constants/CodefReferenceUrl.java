@@ -3,7 +3,8 @@ package io.codef.api.constants;
 public enum CodefReferenceUrl {
     KEY("https://codef.io/account/keys"),
     DEV_GUIDE_REST_API("https://developer.codef.io/common-guide/rest-api"),
-    GITHUB("https://github.com/codef-io/easycodef-java-v2");
+    GITHUB("https://github.com/codef-io/easycodef-java-v2"),
+    PRODUCT("https://developer.codef.io/product/api");
 
     private final String url;
 

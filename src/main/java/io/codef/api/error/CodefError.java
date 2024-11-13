@@ -50,6 +50,18 @@ public enum CodefError {
     NEED_TO_SECURE_WITH_METHOD(
             "To encrypt the parameters, you must call the following method: EasyCodefRequestBuilder.builder().secureWith(easyCodef).",
             CodefReferenceUrl.GITHUB
+    ),
+    NEED_TO_PATH_METHOD(
+            "To request codef product, you must call the following method: EasyCodefRequestBuilder.builder().path(\"/v1/kr/***/***...\").",
+            CodefReferenceUrl.GITHUB
+    ),
+    NEED_TO_ORGANIZATION_METHOD(
+            "To request codef product, you must call the following method: EasyCodefRequestBuilder.builder().organization(\"0xxx\").",
+            CodefReferenceUrl.GITHUB
+    ),
+    INVALID_PATH_REQUESTED(
+            "The path should be requested in the following format: `/v1/kr/***/***/...`",
+            CodefReferenceUrl.PRODUCT
     );
 
     private final String message;

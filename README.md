@@ -11,9 +11,11 @@
 
 # easycodef-java-v2
 
-`easycodef-java-v2`는 codef API를 더욱 더 편리하게 연동할 수 있도록 돕는 오픈소스 라이브러리입니다.
+`easycodef-java-v2`는 codef API를 JDK 환경에서 더욱 더 편리하게 연동할 수 있도록 돕는 오픈소스 라이브러리입니다.
 
 현재 알파 버전 개발중으로 v2.0.0-ALPHA-002 버전으로 Maven Central Repository를 통해 배포중입니다.
+
+2024년 상반기 실제 고객사 대상으로 릴리즈 예정입니다.
 
 ## Release
 
@@ -44,6 +46,32 @@
         <version>2.0.0-alpha-002</version>
     </dependency>
     ```
+
+## Get It !
+
+- 예제 코드
+  ```java
+  EasyCodef easyCodef = EasyCodefBuilder.builder()
+          .clientType(CodefClientType.DEMO)
+          .clientId("your-client-id")
+          .clientSecret("your-client-secret")
+          .publicKey("your-public-key")
+          .build();
+  
+  EasyCodefRequest request = EasyCodefRequestBuilder.builder()
+          .path("/v1/kr/public/hw/nip-cdc-list/my-vaccination")
+          .organization("0011")
+          .requestBody("loginType", "1")
+          .requestBody("userId", "your-nhis-id")
+          .secureRequestBody("userPassword", "your-nhis-password")
+          .secureWith(easyCodef)
+          .build();
+  
+  EasyCodefResponse easyCodefResponse = easyCodef.requestProduct(request);
+  
+  final EasyCodefResponse.Result result = easyCodefResponse.result();
+  final Object data = easyCodefResponse.data();
+  ```
 
 ## LISENCE
 

@@ -21,14 +21,15 @@ public class EasyCodef {
         this.easyCodefToken = easyCodefToken;
     }
 
-    public EasyCodefResponse requestProduct(
-            EasyCodefRequest request,
-            String path
-    ) {
-        final String requestUrl = clientType.getHost() + path;
-        final EasyCodefToken easyCodefToken = this.easyCodefToken.validateAndRefreshToken();
+    public EasyCodefResponse requestProduct(EasyCodefRequest request) {
+        final String requestUrl = generateRequestUrl(request);
+        easyCodefToken.validateAndRefreshToken();
 
         return EasyCodefConnector.requestProduct(request, easyCodefToken, requestUrl);
+    }
+
+    private String generateRequestUrl(EasyCodefRequest request) {
+        return clientType.getHost() + request.path();
     }
 
     public PublicKey getPublicKey() {

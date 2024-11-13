@@ -2,5 +2,8 @@ package io.codef.api.dto;
 
 import java.util.HashMap;
 
-public record EasyCodefRequest(HashMap<String, Object> requestParams) {
+public record EasyCodefRequest(
+        String path,
+        HashMap<String, Object> requestParams
+) {
 }

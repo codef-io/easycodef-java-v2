@@ -23,6 +23,7 @@ import static org.apache.hc.core5.http.HttpHeaders.AUTHORIZATION;
 final class EasyCodefConnector {
 
     static String issueToken(String codefOAuthToken) {
+        System.out.println("issue Token !!!\n\n");
         final String BASIC_TOKEN_FORMAT = BASIC + " %s";
         final String accessTokenParameter = "access_token";
 
@@ -63,7 +64,6 @@ final class EasyCodefConnector {
             HttpPost httpPost = new HttpPost(requestUrl);
             httpPost.addHeader(AUTHORIZATION, String.format(BEARER_TOKEN_FORMAT, token.getAccessToken()));
             String rawRequest = JSON.toJSONString(request.requestParams());
-            System.out.println("rawRequest = " + rawRequest);
             httpPost.setEntity(new StringEntity(rawRequest));
 
             return httpClient.execute(httpPost, response -> {
@@ -71,14 +71,10 @@ final class EasyCodefConnector {
                 String decodedResponse = URLDecoder.decode(httpResponse, "UTF-8");
 
                 // TODO {"error":"invalid_token","error_description":"Cannot convert access token to JSON","code":"CF-09990","message":"OAUTH2.0 토큰 에러입니다. 메시지를 확인하세요."}
-                System.out.println("decodedResponse = " + decodedResponse);
                 JSONObject jsonResponseObject = JSON.parseObject(decodedResponse);
 
                 EasyCodefResponse.Result resultResponse = jsonResponseObject.getJSONObject("result").to(EasyCodefResponse.Result.class);
                 Object dataResponse = jsonResponseObject.getJSONObject("data").to(Object.class);
-
-                System.out.println("result code = " + resultResponse.code());
-
                 return new EasyCodefResponse(resultResponse, dataResponse);
             });
         } catch (CodefException exception) {

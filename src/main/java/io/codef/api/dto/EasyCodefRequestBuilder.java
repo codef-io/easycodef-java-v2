@@ -11,6 +11,7 @@ public class EasyCodefRequestBuilder {
 
     private final HashMap<String, Object> generalRequestBody;
     private final HashMap<String, String> secureRequestBody;
+    private String path;
     private EasyCodef easyCodef;
 
     private EasyCodefRequestBuilder() {
@@ -24,6 +25,15 @@ public class EasyCodefRequestBuilder {
 
     public EasyCodefRequestBuilder organization(Object value) {
         generalRequestBody.put("organization", value);
+        return this;
+    }
+
+    public EasyCodefRequestBuilder path(String path) {
+        this.path = path;
+
+        if(!path.startsWith("/v1")) {
+            throw CodefException.from(CodefError.INVALID_PATH_REQUESTED);
+        }
         return this;
     }
 
@@ -63,8 +73,16 @@ public class EasyCodefRequestBuilder {
             }
         }
 
+        if (path == null) {
+            throw CodefException.from(CodefError.NEED_TO_PATH_METHOD);
+        }
+
+        if (generalRequestBody.get("organization") == null) {
+            throw CodefException.from(CodefError.NEED_TO_ORGANIZATION_METHOD);
+        }
+
         this.requestBody(EASY_CODEF_JAVA_FLAG, true);
         this.generalRequestBody.putAll(secureRequestBody);
-        return new EasyCodefRequest(this.generalRequestBody);
+        return new EasyCodefRequest(path, generalRequestBody);
     }
 }
