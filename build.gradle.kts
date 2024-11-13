@@ -89,7 +89,7 @@ dependencies {
      * https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j2-impl
      */
     implementation("org.apache.httpcomponents.client5:httpclient5:5.4.1")
-    testImplementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.1")
+    implementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.1")
 
     /**
      * 2024-10-21 Latest

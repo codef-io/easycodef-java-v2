@@ -23,9 +23,8 @@ public class EasyCodef {
 
     public EasyCodefResponse requestProduct(EasyCodefRequest request) {
         final String requestUrl = generateRequestUrl(request);
-        easyCodefToken.validateAndRefreshToken();
-
-        return EasyCodefConnector.requestProduct(request, easyCodefToken, requestUrl);
+        final EasyCodefToken validToken = easyCodefToken.validateAndRefreshToken();
+        return EasyCodefConnector.requestProduct(request, validToken, requestUrl);
     }
 
     private String generateRequestUrl(EasyCodefRequest request) {

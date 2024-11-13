@@ -1,11 +1,17 @@
 package io.codef.api.dto;
 
+import io.codef.api.CodefValidator;
 import io.codef.api.EasyCodef;
 import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
 import io.codef.api.util.RsaUtil;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+import static io.codef.api.dto.EasyCodefRequest.EASY_CODEF_JAVA_FLAG;
+import static io.codef.api.dto.EasyCodefRequest.ORGANIZATION;
 
 public class EasyCodefRequestBuilder {
 
@@ -24,16 +30,18 @@ public class EasyCodefRequestBuilder {
     }
 
     public EasyCodefRequestBuilder organization(Object value) {
-        generalRequestBody.put("organization", value);
+        CodefValidator.requireNonNullElseThrow(value, CodefError.NULL_ORGANIZATION);
+        generalRequestBody.put(ORGANIZATION, value);
         return this;
     }
 
     public EasyCodefRequestBuilder path(String path) {
         this.path = path;
 
-        if(!path.startsWith("/v1")) {
-            throw CodefException.from(CodefError.INVALID_PATH_REQUESTED);
-        }
+        Optional.of(path)
+                .filter(p -> p.startsWith("/v1"))
+                .orElseThrow(() -> CodefException.from(CodefError.INVALID_PATH_REQUESTED));
+
         return this;
     }
 
@@ -59,30 +67,27 @@ public class EasyCodefRequestBuilder {
     }
 
     public EasyCodefRequest build() {
-        final HashMap<String, Object> requests = new HashMap<>();
-        final String EASY_CODEF_JAVA_FLAG = "easyCodefJavaV2";
+        CodefValidator.requireNonNullElseThrow(path, CodefError.NEED_TO_PATH_METHOD);
+        CodefValidator.requireNonNullElseThrow(generalRequestBody.get(ORGANIZATION), CodefError.NEED_TO_ORGANIZATION_METHOD);
 
-        if (!secureRequestBody.isEmpty()) {
-            if (easyCodef == null) {
-                throw CodefException.from(CodefError.NEED_TO_SECURE_WITH_METHOD);
-            } else {
-                secureRequestBody.forEach((key, value) -> {
-                    String encryptedValue = RsaUtil.encryptRSA(value, easyCodef.getPublicKey());
-                    secureRequestBody.put(key, encryptedValue);
-                });
-            }
-        }
-
-        if (path == null) {
-            throw CodefException.from(CodefError.NEED_TO_PATH_METHOD);
-        }
-
-        if (generalRequestBody.get("organization") == null) {
-            throw CodefException.from(CodefError.NEED_TO_ORGANIZATION_METHOD);
-        }
+        encryptSecureRequestBody();
 
         this.requestBody(EASY_CODEF_JAVA_FLAG, true);
         this.generalRequestBody.putAll(secureRequestBody);
+
         return new EasyCodefRequest(path, generalRequestBody);
+    }
+
+    private void encryptSecureRequestBody() {
+        Optional.of(secureRequestBody)
+                .filter(body -> !body.isEmpty())
+                .ifPresent(body -> {
+                    CodefValidator.requireNonNullElseThrow(easyCodef, CodefError.NEED_TO_SECURE_WITH_METHOD);
+                    encryptRequestBodyValues(body);
+                });
+    }
+
+    private void encryptRequestBodyValues(Map<String, String> body) {
+        body.replaceAll((key, value) -> RsaUtil.encryptRSA(value, easyCodef.getPublicKey()));
     }
 }

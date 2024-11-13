@@ -6,7 +6,7 @@ import io.codef.api.error.CodefException;
 import java.util.Optional;
 import java.util.UUID;
 
-final class CodefValidator {
+public final class CodefValidator {
 
     private CodefValidator() {
     }
