@@ -5,13 +5,16 @@ on:
     branches:
       - master
   pull_request:
+    branches:
+      - develop
+      - master
 
 jobs:
   verify:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java-version: [17, 21, 23]
+        java-version: [ 17, 21, 23 ]
 
     steps:
       - name: Checkout code
