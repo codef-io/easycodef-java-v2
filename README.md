@@ -12,7 +12,11 @@
 <br>
 
 <p align="center">
-  <span><code>easycodef-java-v2</code> - Open-Source library<br>With the <b>CODEF API</b> in a JDK environment</span>
+  <span><code>easycodef-java-v2</code><br><b>Open-Source Library</b><br>For the <b>CODEF API</b></span>
+<p align="center">
+<br>
+<img alt="헥토데이터" src="https://github.com/user-attachments/assets/ac6b7a7d-33f1-4b1e-9fbb-8231d56e7f33" height="20"><br>
+<span>MIT © | <a href="https://github.com/codef-io/easycodef-java-v2/blob/master/LICENSE" target="_blank">LICENSE</a></span>
 </p>
 
 <br>
@@ -23,25 +27,26 @@
   <a href="https://central.sonatype.com/artifact/io.codef.api/easycodef-java-v2"><img align="center"  src="https://img.shields.io/maven-central/v/io.codef.api/easycodef-java-v2.svg?style=for-the-badge&label=Maven%20Central&logo=apache-maven&color=C71A36" alt="Maven Central"/></a>
 </p>
 
+<br><br>
 
-<br><br><br>
+---
 
 ### EasyCodef V2 For Java
-- **[EasyCodef V2 Wiki](https://github.com/codef-io/easycodef-java-v2/wiki)<br><br>**
+
+- **[EasyCodef V2 Wiki](https://github.com/codef-io/easycodef-java-v2/wiki)**
+
+        Latest version support feature
+
+        → EasyCodef.requestProduct(EasyCodefRequest request) : 비인증 상품 호출
+
+        → EasyCodef.requestSimpleAuthProduct() : 사용자 본인인증 (간편 인증) 상품 호출
+        → EasyCodef.requestSimpleAuthCertification() : 사용자 본인인증 (간편 인증) 상품 호출
+
+
 - [Codef Homepage](https://codef.io/)
 - [Codef API Developer Guide](https://developer.codef.io/)
 - [Hectodata Homepage](https://hectodata.co.kr/)
 - [Hecto Tech Blog](https://blog.hectodata.co.kr/)
 
 <br>
-
----
-
-<br>
-
-<p align="center">
-<img alt="헥토데이터" src="https://github.com/user-attachments/assets/ac6b7a7d-33f1-4b1e-9fbb-8231d56e7f33" height="20"><br>
-<span>MIT © | <a href="https://github.com/codef-io/easycodef-java-v2/blob/master/LICENSE" target="_blank">LICENSE</a></span>
-</p>
-
 <br>
