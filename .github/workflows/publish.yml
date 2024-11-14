@@ -13,7 +13,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     if: |
-      github.event.workflow_run.conclusion == 'success' &&github.event.workflow_run.head_branch == 'master'
+      github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'master'
 
     steps:
       - name: Checkout code
@@ -21,12 +21,6 @@ jobs:
         with:
           fetch-depth: 0
           ref: master
-
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -68,4 +62,4 @@ jobs:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
         run: |
-          ./gradlew publishAllPublicationsToMavenCentralRepository --stacktrace --debug
+          ./gradlew publishAllPublicationsToMavenCentralRepository
