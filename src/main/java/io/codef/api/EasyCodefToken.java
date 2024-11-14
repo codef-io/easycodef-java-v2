@@ -14,13 +14,13 @@ public class EasyCodefToken {
 
         String combinedKey = String.join(DELIMITER, builder.getClientId().toString(), builder.getClientSecret().toString());
         this.oauthToken = Base64.getEncoder().encodeToString(combinedKey.getBytes());
-        this.accessToken = EasyCodefConnector.issueToken(oauthToken);
+        this.accessToken = EasyCodefConnector.requestToken(oauthToken);
         this.expiresAt = LocalDateTime.now().plusDays(VALIDITY_PERIOD_DAYS);
     }
 
     public EasyCodefToken validateAndRefreshToken() {
         if (expiresAt.isBefore(LocalDateTime.now().plusHours(24))) {
-            this.accessToken = EasyCodefConnector.issueToken(oauthToken);
+            this.accessToken = EasyCodefConnector.requestToken(oauthToken);
             this.expiresAt = LocalDateTime.now().plusDays(7);
         }
         return this;

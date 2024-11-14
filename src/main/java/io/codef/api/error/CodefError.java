@@ -31,16 +31,24 @@ public enum CodefError {
             "clientType is required and cannot be null.",
             CodefReferenceUrl.KEY
     ),
+    NULL_ORGANIZATION(
+            "organization is required and cannot be null.",
+            CodefReferenceUrl.DEV_GUIDE_REST_API
+    ),
     OAUTH_UNAUTHORIZED(
             "Failed to authenticate with the Codef OAuth server (401 Unauthorized). Please verify your clientId and clientSecret values.",
             CodefReferenceUrl.KEY
     ),
     OAUTH_INTERNAL_ERROR(
-            "An error occurred on the Codef OAuth server (500 Internal Server Error). Please try again later, or contact support if the issue persists.",
+            "An error occurred on the Codef OAuth server. Please try again later, or contact support if the issue persists.",
             CodefReferenceUrl.KEY
     ),
     OAUTH_CONNECTION_ERROR(
             "The connection to the OAUTH server failed. Please check if `https://oauth.codef.io` is accessible.",
+            CodefReferenceUrl.DEV_GUIDE_REST_API
+    ),
+    CODEF_API_SERVER_ERROR(
+            "An error occurred during the request codef API Product. Please refer to the error message for details.",
             CodefReferenceUrl.DEV_GUIDE_REST_API
     ),
     RSA_ENCRYPTION_ERROR(
@@ -62,6 +70,18 @@ public enum CodefError {
     INVALID_PATH_REQUESTED(
             "The path should be requested in the following format: `/v1/kr/***/***/...`",
             CodefReferenceUrl.PRODUCT
+    ),
+    INTERNAL_SERVER_ERROR(
+            "An error occurred on your request.",
+            CodefReferenceUrl.DEV_GUIDE_REST_API
+    ),
+    PARSE_ERROR(
+            "An exception occurred because the client could not parse the server response in the expected format, possibly due to incorrect headers or body format.",
+            CodefReferenceUrl.TECH_INQUIRY
+    ),
+    IO_ERROR(
+            "An error occurred because the request was either not sent properly or not received. Please check if the outbound port to IP: 211.55.34.5, PORT: 443 is open.",
+            CodefReferenceUrl.TECH_INQUIRY
     );
 
     private final String message;
@@ -80,4 +100,4 @@ public enum CodefError {
     public String getMessage() {
         return String.format(MESSAGE_FORMAT, message, referenceUrl.getUrl());
     }
-}
+    }

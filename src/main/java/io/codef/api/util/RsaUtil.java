@@ -10,6 +10,9 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 public class RsaUtil {
+    private RsaUtil() {
+    }
+
     public static String encryptRSA(String plainText, PublicKey publicKey) {
         try {
             Cipher cipher = initializeCipher(publicKey);

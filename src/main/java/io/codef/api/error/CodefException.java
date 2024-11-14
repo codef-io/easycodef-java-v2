@@ -16,6 +16,11 @@ public class CodefException extends RuntimeException {
         this.codefError = codefError;
     }
 
+    private CodefException(CodefError codefError, String extraMessage) {
+        super(codefError.getMessage() + '\n' + extraMessage);
+        this.codefError = codefError;
+    }
+
     private CodefException(CodefError codefError) {
         super(codefError.getMessage() + '\n');
         this.codefError = codefError;
@@ -30,5 +35,12 @@ public class CodefException extends RuntimeException {
             Exception exception
     ) {
         return new CodefException(codefError, exception);
+    }
+
+    public static CodefException of(
+            CodefError codefError,
+            String extraMessage
+    ) {
+        return new CodefException(codefError, extraMessage);
     }
 }
