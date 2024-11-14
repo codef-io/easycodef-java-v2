@@ -25,4 +25,9 @@ public record EasyCodefRequest(
      */
     public static final String ORGANIZATION = "organization";
     public static final String EASY_CODEF_JAVA_FLAG = "easyCodefJavaV2";
+
+    /**
+     * Path Format Constants
+     */
+    public static final String PATH_PREFIX = "/v1";
 }

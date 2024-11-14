@@ -10,8 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static io.codef.api.dto.EasyCodefRequest.EASY_CODEF_JAVA_FLAG;
-import static io.codef.api.dto.EasyCodefRequest.ORGANIZATION;
+import static io.codef.api.dto.EasyCodefRequest.*;
 
 public class EasyCodefRequestBuilder {
 
@@ -39,7 +38,7 @@ public class EasyCodefRequestBuilder {
         this.path = path;
 
         Optional.of(path)
-                .filter(p -> p.startsWith("/v1"))
+                .filter(p -> p.startsWith(PATH_PREFIX))
                 .orElseThrow(() -> CodefException.from(CodefError.INVALID_PATH_REQUESTED));
 
         return this;

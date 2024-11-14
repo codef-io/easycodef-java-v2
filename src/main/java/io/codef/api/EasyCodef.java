@@ -27,6 +27,7 @@ public class EasyCodef {
     ) throws CodefException {
         final String requestUrl = clientType.getHost() + request.path();
         final EasyCodefToken validToken = easyCodefToken.validateAndRefreshToken();
+        
         return EasyCodefConnector.requestProduct(request, validToken, requestUrl);
     }
 
