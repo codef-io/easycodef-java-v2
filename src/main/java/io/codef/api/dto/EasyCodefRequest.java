@@ -21,6 +21,12 @@ public record EasyCodefRequest(
     public static final String ACCESS_TOKEN = "access_token";
 
     /**
+     * Body Key Constant
+     */
+    public static final String IS_TWO_WAY = "is2Way";
+
+
+    /**
      * Header Format Constants
      */
     public static final String ORGANIZATION = "organization";

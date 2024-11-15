@@ -82,8 +82,14 @@ public enum CodefError {
     IO_ERROR(
             "An error occurred because the request was either not sent properly or not received. Please check if the outbound port to IP: 211.55.34.5, PORT: 443 is open.",
             CodefReferenceUrl.TECH_INQUIRY
+    ),
+    SIMPLE_AUTH_FAILED(
+            "No initial request data is saved for the specified transaction ID.",
+            CodefReferenceUrl.TECH_INQUIRY
     );
 
+
+    private static final String MESSAGE_FORMAT = "[EasyCodef] %s\n%s";
     private final String message;
     private final CodefReferenceUrl referenceUrl;
 
@@ -95,9 +101,7 @@ public enum CodefError {
         this.referenceUrl = referenceUrl;
     }
 
-    private static final String MESSAGE_FORMAT = "[EasyCodef] %s\n%s";
-
     public String getMessage() {
         return String.format(MESSAGE_FORMAT, message, referenceUrl.getUrl());
     }
-    }
+}
