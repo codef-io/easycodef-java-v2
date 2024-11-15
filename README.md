@@ -29,19 +29,16 @@
 
 <br><br>
 
----
-
-### EasyCodef V2 For Java
+### easycodef-java-v2
 
 - **[EasyCodef V2 Wiki](https://github.com/codef-io/easycodef-java-v2/wiki)**
 
         Latest version support feature
 
         → EasyCodef.requestProduct(EasyCodefRequest request) : 비인증 상품 호출
+        → EasyCodef.requestSimpleAuthCertification() : 사용자 본인 인증(간편 인증) 완료 호출
 
-        → EasyCodef.requestSimpleAuthProduct() : 사용자 본인인증 (간편 인증) 상품 호출
-        → EasyCodef.requestSimpleAuthCertification() : 사용자 본인인증 (간편 인증) 상품 호출
-
+<br>
 
 - [Codef Homepage](https://codef.io/)
 - [Codef API Developer Guide](https://developer.codef.io/)
