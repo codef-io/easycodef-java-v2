@@ -28,6 +28,12 @@ public class EasyCodefRequestBuilder {
         return new EasyCodefRequestBuilder();
     }
 
+    private static void requireValidPathElseThrow(String path) {
+        Optional.of(path)
+                .filter(p -> p.startsWith(PATH_PREFIX))
+                .orElseThrow(() -> CodefException.from(CodefError.INVALID_PATH_REQUESTED));
+    }
+
     public EasyCodefRequestBuilder organization(Object value) {
         CodefValidator.requireNonNullElseThrow(value, CodefError.NULL_ORGANIZATION);
         generalRequestBody.put(ORGANIZATION, value);
@@ -36,10 +42,7 @@ public class EasyCodefRequestBuilder {
 
     public EasyCodefRequestBuilder path(String path) {
         this.path = path;
-
-        Optional.of(path)
-                .filter(p -> p.startsWith(PATH_PREFIX))
-                .orElseThrow(() -> CodefException.from(CodefError.INVALID_PATH_REQUESTED));
+        requireValidPathElseThrow(path);
 
         return this;
     }

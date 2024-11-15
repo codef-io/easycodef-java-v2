@@ -60,7 +60,7 @@ public enum CodefError {
             CodefReferenceUrl.GITHUB
     ),
     NEED_TO_PATH_METHOD(
-            "To request codef product, you must call the following method: EasyCodefRequestBuilder.builder().requestUrl(\"/v1/kr/***/***...\").",
+            "To request codef product, you must call the following method: EasyCodefRequestBuilder.builder().path(\"/v1/kr/***/***...\").",
             CodefReferenceUrl.GITHUB
     ),
     NEED_TO_ORGANIZATION_METHOD(
@@ -68,7 +68,7 @@ public enum CodefError {
             CodefReferenceUrl.GITHUB
     ),
     INVALID_PATH_REQUESTED(
-            "The requestUrl should be requested in the following format: `/v1/kr/***/***/...`",
+            "The path should be requested in the following format: `/v1/kr/***/***/...`",
             CodefReferenceUrl.PRODUCT
     ),
     INTERNAL_SERVER_ERROR(
