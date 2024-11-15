@@ -21,10 +21,16 @@ public record EasyCodefRequest(
     public static final String ACCESS_TOKEN = "access_token";
 
     /**
-     * Body Key Constant
+     * Request Body Key Constant
      */
     public static final String IS_TWO_WAY = "is2Way";
+    public static final String SIMPLE_AUTH = "simpleAuth";
+    public static final String TWO_WAY_INFO = "twoWayInfo";
 
+    /**
+     * Request Body Value Constant
+     */
+    public static final String TRUE = "1";
 
     /**
      * Header Format Constants

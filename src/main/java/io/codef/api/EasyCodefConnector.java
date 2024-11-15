@@ -23,13 +23,6 @@ public final class EasyCodefConnector {
     private EasyCodefConnector() {
     }
 
-    public static String requestToken(
-            String codefOAuthToken
-    ) throws CodefException {
-        HttpPost request = createTokenRequest(codefOAuthToken);
-        return executeRequest(request, responseHandler::handleTokenResponse);
-    }
-
     public static EasyCodefResponse requestProduct(
             EasyCodefRequest request,
             EasyCodefToken token,
@@ -43,6 +36,13 @@ public final class EasyCodefConnector {
         HttpPost httpPost = new HttpPost(CodefHost.CODEF_OAUTH_SERVER + CodefPath.ISSUE_TOKEN);
         httpPost.addHeader(AUTHORIZATION, String.format(BASIC_TOKEN_FORMAT, codefOAuthToken));
         return httpPost;
+    }
+    
+    public static String requestToken(
+            String codefOAuthToken
+    ) throws CodefException {
+        HttpPost request = createTokenRequest(codefOAuthToken);
+        return executeRequest(request, responseHandler::handleTokenResponse);
     }
 
     private static HttpPost createProductRequest(
