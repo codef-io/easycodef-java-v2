@@ -9,7 +9,6 @@ import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
 import io.codef.api.util.HttpClientUtil;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 
 import java.nio.charset.StandardCharsets;
@@ -22,14 +21,6 @@ public final class EasyCodefConnector {
     private static final ResponseHandler responseHandler = new ResponseHandler();
 
     private EasyCodefConnector() {
-        throw new IllegalStateException("Utility class");
-    }
-
-    public static String requestToken(
-            String codefOAuthToken
-    ) throws CodefException {
-        HttpPost request = createTokenRequest(codefOAuthToken);
-        return executeRequest(request, responseHandler::handleTokenResponse);
     }
 
     public static EasyCodefResponse requestProduct(
@@ -45,6 +36,13 @@ public final class EasyCodefConnector {
         HttpPost httpPost = new HttpPost(CodefHost.CODEF_OAUTH_SERVER + CodefPath.ISSUE_TOKEN);
         httpPost.addHeader(AUTHORIZATION, String.format(BASIC_TOKEN_FORMAT, codefOAuthToken));
         return httpPost;
+    }
+    
+    public static String requestToken(
+            String codefOAuthToken
+    ) throws CodefException {
+        HttpPost request = createTokenRequest(codefOAuthToken);
+        return executeRequest(request, responseHandler::handleTokenResponse);
     }
 
     private static HttpPost createProductRequest(
@@ -65,7 +63,7 @@ public final class EasyCodefConnector {
             HttpPost request,
             ResponseProcessor<T> processor
     ) {
-        try (CloseableHttpClient httpClient = HttpClientUtil.createClient()) {
+        try (var httpClient = HttpClientUtil.createClient()) {
             return httpClient.execute(request, processor::process);
         } catch (CodefException e) {
             throw e;

@@ -7,6 +7,14 @@ public record EasyCodefResponse(
     public static final String RESULT = "result";
     public static final String DATA = "data";
 
+    public String code() {
+        return this.result().code();
+    }
+
+    public String transactionId() {
+        return this.result().transactionId();
+    }
+
     public record Result(
             String code,
             String extraMessage,

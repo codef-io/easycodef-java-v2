@@ -25,9 +25,10 @@ public class ResponseHandler {
     public String handleTokenResponse(ClassicHttpResponse response) {
         try {
             final String responseBody = EntityUtils.toString(response.getEntity());
+            final int httpStatusCode = response.getCode();
 
-            return switch (response.getCode()) {
-                case HttpStatus.SC_OK -> JSON.parseObject(responseBody).getString(ACCESS_TOKEN);
+            return switch (httpStatusCode) {
+                case HttpStatus.SC_OK -> parseAccessToken(responseBody);
                 case HttpStatus.SC_UNAUTHORIZED -> throw CodefException.of(CodefError.OAUTH_UNAUTHORIZED, responseBody);
                 default -> throw CodefException.of(CodefError.OAUTH_INTERNAL_ERROR, responseBody);
             };
@@ -47,7 +48,7 @@ public class ResponseHandler {
 
             return switch (httpStatusCode) {
                 case HttpStatus.SC_OK -> {
-                    final String decodedResponse = URLDecoder.decode(httpResponse, StandardCharsets.UTF_8);
+                    final var decodedResponse = URLDecoder.decode(httpResponse, StandardCharsets.UTF_8);
                     yield parseProductResponse(decodedResponse);
                 }
                 case HttpStatus.SC_UNAUTHORIZED -> throw CodefException.of(CodefError.OAUTH_UNAUTHORIZED, httpResponse);
@@ -58,6 +59,11 @@ public class ResponseHandler {
         } catch (ParseException exception) {
             throw CodefException.of(CodefError.PARSE_ERROR, exception);
         }
+    }
+
+
+    private String parseAccessToken(String responseBody) {
+        return JSON.parseObject(responseBody).getString(ACCESS_TOKEN);
     }
 
     private EasyCodefResponse parseProductResponse(String decodedResponse) {
