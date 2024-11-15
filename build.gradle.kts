@@ -10,7 +10,7 @@ plugins {
 
 
 group = "io.codef.api"
-version = "2.0.0-alpha-003"
+version = "2.0.0-alpha-004"
 
 signing {
     useInMemoryPgpKeys(
