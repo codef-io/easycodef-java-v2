@@ -10,8 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static io.codef.api.dto.EasyCodefRequest.EASY_CODEF_JAVA_FLAG;
-import static io.codef.api.dto.EasyCodefRequest.ORGANIZATION;
+import static io.codef.api.dto.EasyCodefRequest.*;
 
 public class EasyCodefRequestBuilder {
 
@@ -29,6 +28,12 @@ public class EasyCodefRequestBuilder {
         return new EasyCodefRequestBuilder();
     }
 
+    private static void requireValidPathElseThrow(String path) {
+        Optional.of(path)
+                .filter(p -> p.startsWith(PATH_PREFIX))
+                .orElseThrow(() -> CodefException.from(CodefError.INVALID_PATH_REQUESTED));
+    }
+
     public EasyCodefRequestBuilder organization(Object value) {
         CodefValidator.requireNonNullElseThrow(value, CodefError.NULL_ORGANIZATION);
         generalRequestBody.put(ORGANIZATION, value);
@@ -37,10 +42,7 @@ public class EasyCodefRequestBuilder {
 
     public EasyCodefRequestBuilder path(String path) {
         this.path = path;
-
-        Optional.of(path)
-                .filter(p -> p.startsWith("/v1"))
-                .orElseThrow(() -> CodefException.from(CodefError.INVALID_PATH_REQUESTED));
+        requireValidPathElseThrow(path);
 
         return this;
     }
