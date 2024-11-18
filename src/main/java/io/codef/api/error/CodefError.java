@@ -35,6 +35,10 @@ public enum CodefError {
             "Failed to authenticate with the Codef OAuth server (401 Unauthorized). Please verify your clientId and clientSecret values.",
             CodefReferenceUrl.KEY
     ),
+    API_UNAUTHORIZED(
+            "Failed to authenticate with the Codef API server (401 Unauthorized). Please verify your clientId and clientSecret values.",
+            CodefReferenceUrl.KEY
+    ),
     OAUTH_INTERNAL_ERROR(
             "An error occurred on the Codef OAuth server. Please try again later, or contact support if the issue persists.",
             CodefReferenceUrl.KEY

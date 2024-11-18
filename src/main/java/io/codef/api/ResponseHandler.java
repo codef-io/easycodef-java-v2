@@ -51,8 +51,8 @@ public class ResponseHandler {
                     final var decodedResponse = URLDecoder.decode(httpResponse, StandardCharsets.UTF_8);
                     yield parseProductResponse(decodedResponse);
                 }
-                case HttpStatus.SC_UNAUTHORIZED -> throw CodefException.of(CodefError.OAUTH_UNAUTHORIZED, httpResponse);
-                default -> throw CodefException.of(CodefError.OAUTH_INTERNAL_ERROR, httpResponse);
+                case HttpStatus.SC_UNAUTHORIZED -> throw CodefException.of(CodefError.API_UNAUTHORIZED, httpResponse);
+                default -> throw CodefException.of(CodefError.CODEF_API_SERVER_ERROR, httpResponse);
             };
         } catch (IOException exception) {
             throw CodefException.of(CodefError.IO_ERROR, exception);

@@ -30,10 +30,6 @@ public class EasyCodef {
         this.easyCodefToken = easyCodefToken;
     }
 
-    private static void addSsoInfo(List<EasyCodefRequest> requests, String ssoId) {
-        requests.forEach(request -> request.requestBody().put(SSO_ID, ssoId));
-    }
-
     public EasyCodefResponse requestProduct(EasyCodefRequest request) throws CodefException {
         final String requestUrl = clientType.getHost() + request.path();
         final EasyCodefToken validToken = easyCodefToken.validateAndRefreshToken();
@@ -50,7 +46,6 @@ public class EasyCodef {
 
         final String requestUrl = codefSimpleAuth.requestUrl();
         final EasyCodefRequest request = codefSimpleAuth.request();
-        System.out.println("request = " + request.toString());
 
         addTwoWayInfo(request, codefSimpleAuth);
 
@@ -81,7 +76,6 @@ public class EasyCodef {
                         try {
                             return future.join();
                         } catch (Exception e) {
-                            System.err.println("Error processing response: " + e.getMessage());
                             return null;
                         }
                     })
@@ -113,7 +107,6 @@ public class EasyCodef {
             scheduler.schedule(() -> {
                 CompletableFuture.supplyAsync(() -> {
                     try {
-                        System.out.println("Request: " + request);
                         return requestProduct(request);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
@@ -125,7 +118,7 @@ public class EasyCodef {
                         future.complete(response);
                     }
                 });
-            }, i * 700L, TimeUnit.MILLISECONDS); // 0.7초 간격으로 스케줄링
+            }, i * 700L, TimeUnit.MILLISECONDS);
             futures.add(future);
         }
 
