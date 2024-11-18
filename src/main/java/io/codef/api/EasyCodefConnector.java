@@ -12,13 +12,14 @@ import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import static io.codef.api.dto.EasyCodefRequest.BASIC_TOKEN_FORMAT;
 import static io.codef.api.dto.EasyCodefRequest.BEARER_TOKEN_FORMAT;
 import static org.apache.hc.core5.http.HttpHeaders.AUTHORIZATION;
 
-public final class EasyCodefConnector {
+public class EasyCodefConnector {
     private static final ResponseHandler responseHandler = new ResponseHandler();
 
     private EasyCodefConnector() {
@@ -73,10 +74,8 @@ public final class EasyCodefConnector {
     ) {
         try (var httpClient = HttpClientUtil.createClient()) {
             return httpClient.execute(request, processor::process);
-        } catch (CodefException e) {
-            throw e;
-        } catch (Exception e) {
-            throw CodefException.of(CodefError.INTERNAL_SERVER_ERROR, e);
+        } catch (IOException exception) {
+            throw CodefException.of(CodefError.IO_ERROR, exception);
         }
     }
 

@@ -5,21 +5,26 @@ import io.codef.api.constants.CodefResponseCode;
 import io.codef.api.dto.CodefSimpleAuth;
 import io.codef.api.dto.EasyCodefRequest;
 import io.codef.api.dto.EasyCodefResponse;
-import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
+import io.codef.api.storage.MultipleRequestStorage;
+import io.codef.api.storage.SimpleAuthStorage;
 import io.codef.api.util.RsaUtil;
 
 import java.security.PublicKey;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.*;
+import java.util.stream.IntStream;
 
 import static io.codef.api.dto.EasyCodefRequest.SSO_ID;
 import static io.codef.api.dto.EasyCodefRequest.TRUE;
 
 public class EasyCodef {
-    private final HashMap<String, CodefSimpleAuth> simpleAuthRequestStorage = new HashMap<>();
-    private final HashMap<String, List<CompletableFuture<EasyCodefResponse>>> multipleSimpleAuthRequestStorage = new HashMap<>();
-
+    private static final long REQUEST_DELAY_MS = 700L;
+    private final SimpleAuthStorage simpleAuthStorage;
+    private final MultipleRequestStorage multipleRequestStorage;
     private final PublicKey publicKey;
     private final CodefClientType clientType;
     private final EasyCodefToken easyCodefToken;
@@ -28,133 +33,187 @@ public class EasyCodef {
         this.publicKey = RsaUtil.generatePublicKey(builder.getPublicKey());
         this.clientType = builder.getClientType();
         this.easyCodefToken = easyCodefToken;
+        this.simpleAuthStorage = new SimpleAuthStorage();
+        this.multipleRequestStorage = new MultipleRequestStorage();
     }
 
+    /**
+     * 단일 상품 요청 처리
+     */
     public EasyCodefResponse requestProduct(EasyCodefRequest request) throws CodefException {
-        final String requestUrl = clientType.getHost() + request.path();
-        final EasyCodefToken validToken = easyCodefToken.validateAndRefreshToken();
+        String requestUrl = buildRequestUrl(request);
+        EasyCodefToken validToken = easyCodefToken.validateAndRefreshToken();
 
-        final EasyCodefResponse easyCodefResponse = EasyCodefConnector.requestProduct(request, validToken, requestUrl);
+        EasyCodefResponse response = EasyCodefConnector.requestProduct(request, validToken, requestUrl);
+        simpleAuthStorage.storeIfRequired(request, response, requestUrl);
 
-        storeIfSimpleAuthResponseRequired(request, easyCodefResponse, requestUrl);
-        return easyCodefResponse;
+        return response;
     }
 
+    /**
+     * 간편인증 요청 처리
+     */
     public List<EasyCodefResponse> requestSimpleAuthCertification(String transactionId) throws CodefException {
-        final CodefSimpleAuth codefSimpleAuth = simpleAuthRequestStorage.get(transactionId);
-        CodefValidator.requireNonNullElseThrow(codefSimpleAuth, CodefError.SIMPLE_AUTH_FAILED);
+        CodefSimpleAuth simpleAuth = simpleAuthStorage.get(transactionId);
 
-        final String requestUrl = codefSimpleAuth.requestUrl();
-        final EasyCodefRequest request = codefSimpleAuth.request();
+        EasyCodefRequest enrichedRequest = enrichRequestWithTwoWayInfo(simpleAuth);
+        EasyCodefResponse firstResponse = executeSimpleAuthRequest(enrichedRequest, simpleAuth.requestUrl());
 
-        addTwoWayInfo(request, codefSimpleAuth);
+        simpleAuthStorage.updateIfRequired(
+                simpleAuth.requestUrl(),
+                enrichedRequest,
+                firstResponse,
+                transactionId
+        );
 
-        final EasyCodefToken validToken = easyCodefToken.validateAndRefreshToken();
-        final EasyCodefResponse firstResponse = EasyCodefConnector.requestProduct(request, validToken, requestUrl);
-
-        updateSimpleAuthResponseRequired(requestUrl, request, firstResponse, transactionId);
-
-        if (firstResponse.code().equals(CodefResponseCode.CF_00000)) {
-            List<EasyCodefResponse> remainingResponses = getRemainingResponse(transactionId);
-            final List<EasyCodefResponse> responses = new ArrayList<>(remainingResponses);
-            responses.add(firstResponse);
-
-            return responses;
-        }
-
-        return List.of(firstResponse);
+        return isSuccessful(firstResponse)
+                ? combineWithRemainingResponses(firstResponse, transactionId)
+                : List.of(firstResponse);
     }
 
-    private List<EasyCodefResponse> getRemainingResponse(String transactionId) throws CodefException {
-        final List<CompletableFuture<EasyCodefResponse>> completableFutures = multipleSimpleAuthRequestStorage.get(transactionId);
-
-        if (completableFutures == null || completableFutures.isEmpty()) {
-            throw CodefException.from(CodefError.SIMPLE_AUTH_FAILED);
-        }
-
-        try {
-            CompletableFuture<Void> allDoneFuture = CompletableFuture.allOf(completableFutures.toArray(new CompletableFuture[0]));
-
-            allDoneFuture.join();
-
-            final List<EasyCodefResponse> result = completableFutures.stream().map(future -> {
-                try {
-                    return future.join();
-                } catch (Exception exception) {
-                    throw CodefException.of(CodefError.SIMPLE_AUTH_FAILED, exception);
-                }
-            }).filter(Objects::nonNull).filter(future -> !Objects.equals(future.transactionId(), transactionId)).toList();
-
-            multipleSimpleAuthRequestStorage.remove(transactionId);
-
-            return result;
-        } catch (Exception e) {
-            throw CodefException.from(CodefError.NO_RESPONSE_RECEIVED);
-        }
-    }
-
+    /**
+     * 다중 상품 요청 처리
+     */
     public EasyCodefResponse requestMultipleProduct(List<EasyCodefRequest> requests) throws CodefException {
-        final String uuid = UUID.randomUUID().toString();
-        requests.forEach(request -> request.requestBody().put(SSO_ID, uuid));
+        validateRequests(requests);
 
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        Executor executor = Executors.newThreadPerTaskExecutor(Thread.ofVirtual().factory());
+        String uuid = UUID.randomUUID().toString();
+        assignSsoId(requests, uuid);
 
-        List<CompletableFuture<EasyCodefResponse>> futures = new ArrayList<>();
-
-        for (int i = 0; i < requests.size(); i++) {
-            final EasyCodefRequest request = requests.get(i);
-
-            CompletableFuture<EasyCodefResponse> future = new CompletableFuture<>();
-            scheduler.schedule(() -> {
-                CompletableFuture.supplyAsync(() -> {
-                    try {
-                        return requestProduct(request);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }, executor).whenComplete((response, ex) -> {
-                    if (ex != null) {
-                        future.completeExceptionally(ex);
-                    } else {
-                        future.complete(response);
-                    }
-                });
-            }, i * 700L, TimeUnit.MILLISECONDS);
-            futures.add(future);
+        var executors = createExecutors();
+        try {
+            return processMultipleRequests(requests, executors);
+        } finally {
+            cleanupExecutors(executors);
         }
+    }
 
-        CompletableFuture<EasyCodefResponse> firstCompleted = CompletableFuture.anyOf(futures.toArray(new CompletableFuture[0])).thenApply(result -> (EasyCodefResponse) result);
+    // Private helper methods
 
-        futures.remove(firstCompleted);
+    private String buildRequestUrl(EasyCodefRequest request) {
+        return clientType.getHost() + request.path();
+    }
 
-        final EasyCodefResponse result = firstCompleted.join();
-        multipleSimpleAuthRequestStorage.put(result.transactionId(), futures);
+    private EasyCodefRequest enrichRequestWithTwoWayInfo(CodefSimpleAuth simpleAuth) {
+        EasyCodefRequest request = simpleAuth.request();
+        Map<String, Object> body = request.requestBody();
+
+        body.put(EasyCodefRequest.IS_TWO_WAY, true);
+        body.put(EasyCodefRequest.SIMPLE_AUTH, TRUE);
+        body.put(EasyCodefRequest.TWO_WAY_INFO, simpleAuth.response().data());
+
+        return request;
+    }
+
+    private EasyCodefResponse executeSimpleAuthRequest(EasyCodefRequest request, String requestUrl)
+            throws CodefException {
+        EasyCodefToken validToken = easyCodefToken.validateAndRefreshToken();
+        return EasyCodefConnector.requestProduct(request, validToken, requestUrl);
+    }
+
+    private boolean isSuccessful(EasyCodefResponse response) {
+        return CodefResponseCode.CF_00000.equals(response.code());
+    }
+
+    private List<EasyCodefResponse> combineWithRemainingResponses(
+            EasyCodefResponse firstResponse,
+            String transactionId
+    ) throws CodefException {
+        List<EasyCodefResponse> remainingResponses = multipleRequestStorage.getRemainingResponses(transactionId);
+        List<EasyCodefResponse> allResponses = new ArrayList<>(remainingResponses);
+        allResponses.add(firstResponse);
+        return allResponses;
+    }
+
+    private void validateRequests(List<EasyCodefRequest> requests) {
+        if (requests == null || requests.isEmpty()) {
+            throw new IllegalArgumentException("Requests cannot be null or empty");
+        }
+    }
+
+    private void assignSsoId(List<EasyCodefRequest> requests, String uuid) {
+        requests.forEach(request -> request.requestBody().put(SSO_ID, uuid));
+    }
+
+    private CodefExecutors createExecutors() {
+        return new CodefExecutors(
+                Executors.newScheduledThreadPool(1),
+                Executors.newThreadPerTaskExecutor(Thread.ofVirtual().factory())
+        );
+    }
+
+    private EasyCodefResponse processMultipleRequests(
+            List<EasyCodefRequest> requests,
+            CodefExecutors codefExecutors
+    ) throws CodefException {
+        List<CompletableFuture<EasyCodefResponse>> futures = scheduleRequests(requests, codefExecutors);
+
+        CompletableFuture<EasyCodefResponse> firstCompleted = CompletableFuture.anyOf(
+                futures.toArray(new CompletableFuture[0])
+        ).thenApply(result -> (EasyCodefResponse) result);
+
+        EasyCodefResponse result = firstCompleted.join();
+        multipleRequestStorage.store(result.transactionId(), futures);
 
         return result;
     }
 
-    private void addTwoWayInfo(EasyCodefRequest request, CodefSimpleAuth codefSimpleAuth) {
-        request.requestBody().put(EasyCodefRequest.IS_TWO_WAY, true);
-        request.requestBody().put(EasyCodefRequest.SIMPLE_AUTH, TRUE);
-        request.requestBody().put(EasyCodefRequest.TWO_WAY_INFO, codefSimpleAuth.response().data());
+    private List<CompletableFuture<EasyCodefResponse>> scheduleRequests(
+            List<EasyCodefRequest> requests,
+            CodefExecutors codefExecutors
+    ) {
+        return IntStream.range(0, requests.size())
+                .mapToObj(i -> scheduleRequest(requests.get(i), i * REQUEST_DELAY_MS, codefExecutors))
+                .toList();
     }
 
-    private void storeIfSimpleAuthResponseRequired(EasyCodefRequest request, EasyCodefResponse easyCodefResponse, String requestUrl) {
-        Optional.ofNullable(easyCodefResponse.code()).filter(code -> code.equals(CodefResponseCode.CF_03002)).ifPresent(code -> {
-            CodefSimpleAuth codefSimpleAuth = new CodefSimpleAuth(requestUrl, request, easyCodefResponse);
-            simpleAuthRequestStorage.put(easyCodefResponse.transactionId(), codefSimpleAuth);
+    private CompletableFuture<EasyCodefResponse> scheduleRequest(
+            EasyCodefRequest request,
+            long delayMs,
+            CodefExecutors codefExecutors
+    ) {
+        CompletableFuture<EasyCodefResponse> future = new CompletableFuture<>();
+
+        codefExecutors.scheduler.schedule(
+                () -> executeRequest(request, codefExecutors.virtualThreadExecutor, future),
+                delayMs,
+                TimeUnit.MILLISECONDS
+        );
+
+        return future;
+    }
+
+    private void executeRequest(
+            EasyCodefRequest request,
+            Executor executor,
+            CompletableFuture<EasyCodefResponse> future
+    ) {
+        CompletableFuture.supplyAsync(() -> {
+            try {
+                return requestProduct(request);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }, executor).whenComplete((response, ex) -> {
+            if (ex != null) {
+                future.completeExceptionally(ex);
+            } else {
+                future.complete(response);
+            }
         });
     }
 
-    private void updateSimpleAuthResponseRequired(String path, EasyCodefRequest request, EasyCodefResponse easyCodefResponse, String transactionId) {
-        Optional.ofNullable(easyCodefResponse.code()).filter(code -> code.equals(CodefResponseCode.CF_03002)).ifPresentOrElse(code -> {
-            CodefSimpleAuth newCodefSimpleAuth = new CodefSimpleAuth(path, request, easyCodefResponse);
-            simpleAuthRequestStorage.put(transactionId, newCodefSimpleAuth);
-        }, () -> simpleAuthRequestStorage.remove(transactionId));
+    private void cleanupExecutors(CodefExecutors codefExecutors) {
+        codefExecutors.scheduler.shutdown();
     }
 
     public PublicKey getPublicKey() {
         return publicKey;
+    }
+
+    private record CodefExecutors(
+            ScheduledExecutorService scheduler,
+            Executor virtualThreadExecutor
+    ) {
     }
 }
