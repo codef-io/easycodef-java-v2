@@ -1,6 +1,7 @@
 package io.codef.api;
 
 import io.codef.api.constants.CodefClientType;
+import io.codef.api.constants.CodefResponseCode;
 import io.codef.api.dto.CodefSimpleAuth;
 import io.codef.api.dto.EasyCodefRequest;
 import io.codef.api.dto.EasyCodefResponse;
@@ -12,8 +13,6 @@ import java.security.PublicKey;
 import java.util.*;
 import java.util.concurrent.*;
 
-import static io.codef.api.constants.CodefResponseCode.CF_00000;
-import static io.codef.api.constants.CodefResponseCode.CF_03002;
 import static io.codef.api.dto.EasyCodefRequest.SSO_ID;
 import static io.codef.api.dto.EasyCodefRequest.TRUE;
 
@@ -55,7 +54,7 @@ public class EasyCodef {
 
         updateSimpleAuthResponseRequired(requestUrl, request, firstResponse, transactionId);
 
-        if (firstResponse.code().equals(CF_00000)) {
+        if (firstResponse.code().equals(CodefResponseCode.CF_00000)) {
             List<EasyCodefResponse> remainingResponses = getRemainingResponse(transactionId);
             final List<EasyCodefResponse> responses = new ArrayList<>(remainingResponses);
             responses.add(firstResponse);
@@ -67,31 +66,24 @@ public class EasyCodef {
     }
 
     private List<EasyCodefResponse> getRemainingResponse(String transactionId) throws CodefException {
-        final List<CompletableFuture<EasyCodefResponse>> completableFutures =
-                multipleSimpleAuthRequestStorage.get(transactionId);
+        final List<CompletableFuture<EasyCodefResponse>> completableFutures = multipleSimpleAuthRequestStorage.get(transactionId);
 
         if (completableFutures == null || completableFutures.isEmpty()) {
             throw CodefException.from(CodefError.SIMPLE_AUTH_FAILED);
         }
 
         try {
-            CompletableFuture<Void> allDoneFuture = CompletableFuture.allOf(
-                    completableFutures.toArray(new CompletableFuture[0])
-            );
+            CompletableFuture<Void> allDoneFuture = CompletableFuture.allOf(completableFutures.toArray(new CompletableFuture[0]));
 
             allDoneFuture.join();
 
-            final List<EasyCodefResponse> result = completableFutures.stream()
-                    .map(future -> {
-                        try {
-                            return future.join();
-                        } catch (Exception e) {
-                            return null;
-                        }
-                    })
-                    .filter(Objects::nonNull)
-                    .filter(future -> !Objects.equals(future.transactionId(), transactionId))
-                    .toList();
+            final List<EasyCodefResponse> result = completableFutures.stream().map(future -> {
+                try {
+                    return future.join();
+                } catch (Exception exception) {
+                    throw CodefException.of(CodefError.SIMPLE_AUTH_FAILED, exception);
+                }
+            }).filter(Objects::nonNull).filter(future -> !Objects.equals(future.transactionId(), transactionId)).toList();
 
             multipleSimpleAuthRequestStorage.remove(transactionId);
 
@@ -132,9 +124,7 @@ public class EasyCodef {
             futures.add(future);
         }
 
-        CompletableFuture<EasyCodefResponse> firstCompleted = CompletableFuture.anyOf(
-                futures.toArray(new CompletableFuture[0])
-        ).thenApply(result -> (EasyCodefResponse) result);
+        CompletableFuture<EasyCodefResponse> firstCompleted = CompletableFuture.anyOf(futures.toArray(new CompletableFuture[0])).thenApply(result -> (EasyCodefResponse) result);
 
         futures.remove(firstCompleted);
 
@@ -151,14 +141,14 @@ public class EasyCodef {
     }
 
     private void storeIfSimpleAuthResponseRequired(EasyCodefRequest request, EasyCodefResponse easyCodefResponse, String requestUrl) {
-        Optional.ofNullable(easyCodefResponse.code()).filter(code -> code.equals(CF_03002)).ifPresent(code -> {
+        Optional.ofNullable(easyCodefResponse.code()).filter(code -> code.equals(CodefResponseCode.CF_03002)).ifPresent(code -> {
             CodefSimpleAuth codefSimpleAuth = new CodefSimpleAuth(requestUrl, request, easyCodefResponse);
             simpleAuthRequestStorage.put(easyCodefResponse.transactionId(), codefSimpleAuth);
         });
     }
 
     private void updateSimpleAuthResponseRequired(String path, EasyCodefRequest request, EasyCodefResponse easyCodefResponse, String transactionId) {
-        Optional.ofNullable(easyCodefResponse.code()).filter(code -> code.equals(CF_03002)).ifPresentOrElse(code -> {
+        Optional.ofNullable(easyCodefResponse.code()).filter(code -> code.equals(CodefResponseCode.CF_03002)).ifPresentOrElse(code -> {
             CodefSimpleAuth newCodefSimpleAuth = new CodefSimpleAuth(path, request, easyCodefResponse);
             simpleAuthRequestStorage.put(transactionId, newCodefSimpleAuth);
         }, () -> simpleAuthRequestStorage.remove(transactionId));
