@@ -22,6 +22,9 @@ import static io.codef.api.dto.EasyCodefResponse.RESULT;
 public class ResponseHandler {
     private static final String UTF_8 = StandardCharsets.UTF_8.toString();
 
+    public ResponseHandler() {
+    }
+
     /**
      * 토큰 응답 처리
      */
@@ -80,17 +83,6 @@ public class ResponseHandler {
     }
 
     /**
-     * HTTP 상태 코드에 따른 처리
-     */
-    private <T> T handleStatusCode(String responseBody, HttpStatusHandler<T> handler) throws CodefException {
-        return switch (handler.statusCode) {
-            case HttpStatus.SC_OK -> handler.successHandler.parse(responseBody);
-            case HttpStatus.SC_UNAUTHORIZED -> throw CodefException.of(handler.unauthorizedError, responseBody);
-            default -> throw CodefException.of(handler.defaultError, responseBody);
-        };
-    }
-
-    /**
      * 액세스 토큰 파싱
      */
     private String parseAccessToken(String responseBody) throws CodefException {
@@ -118,12 +110,24 @@ public class ResponseHandler {
         return new EasyCodefResponse(result, data);
     }
 
+    /**
+     * HTTP 상태 코드에 따른 처리
+     */
+    private <T> T handleStatusCode(String responseBody, HttpStatusHandler<T> handler) throws CodefException {
+        return switch (handler.statusCode) {
+            case HttpStatus.SC_OK -> handler.successHandler.parse(responseBody);
+            case HttpStatus.SC_UNAUTHORIZED -> throw CodefException.of(handler.unauthorizedError, responseBody);
+            default -> throw CodefException.of(handler.defaultError, responseBody);
+        };
+    }
 
     /**
      * HTTP 응답 처리를 위한 공통 인터페이스
      */
     private interface ResponseParser<T> {
+
         T parse(String responseBody) throws CodefException;
+
     }
 
     /**

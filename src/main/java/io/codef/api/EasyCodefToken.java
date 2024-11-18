@@ -14,6 +14,7 @@ public class EasyCodefToken {
         final String DELIMITER = ":";
 
         String combinedKey = String.join(DELIMITER, builder.getClientId().toString(), builder.getClientSecret().toString());
+
         this.oauthToken = Base64.getEncoder().encodeToString(combinedKey.getBytes());
         this.accessToken = EasyCodefConnector.requestToken(oauthToken);
         this.expiresAt = LocalDateTime.now().plusDays(VALIDITY_PERIOD_DAYS);
@@ -23,7 +24,7 @@ public class EasyCodefToken {
         Optional.of(expiresAt)
                 .filter(this::isTokenExpiringSoon)
                 .ifPresent(expiry -> refreshToken());
-        
+
         return this;
     }
 
