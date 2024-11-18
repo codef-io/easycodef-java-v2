@@ -38,7 +38,7 @@ public class EasyCodef {
     }
 
     /**
-     * 단일 상품 요청 처리
+     * 단일 상품 요청
      */
     public EasyCodefResponse requestProduct(EasyCodefRequest request) throws CodefException {
         String requestUrl = buildRequestUrl(request);
@@ -51,9 +51,45 @@ public class EasyCodef {
     }
 
     /**
-     * 간편인증 요청 처리
+     * 다중 상품 요청
      */
-    public List<EasyCodefResponse> requestSimpleAuthCertification(String transactionId) throws CodefException {
+    public EasyCodefResponse requestMultipleProduct(List<EasyCodefRequest> requests) throws CodefException {
+        validateRequests(requests);
+
+        String uuid = UUID.randomUUID().toString();
+        assignSsoId(requests, uuid);
+
+        var executors = createExecutors();
+        try {
+            return processMultipleRequests(requests, executors);
+        } finally {
+            cleanupExecutors(executors);
+        }
+    }
+
+    /**
+     * 단건 간편인증 완료 요청
+     */
+    public EasyCodefResponse requestSimpleAuthCertification(String transactionId) throws CodefException {
+        CodefSimpleAuth simpleAuth = simpleAuthStorage.get(transactionId);
+
+        EasyCodefRequest enrichedRequest = enrichRequestWithTwoWayInfo(simpleAuth);
+        EasyCodefResponse response = executeSimpleAuthRequest(enrichedRequest, simpleAuth.requestUrl());
+
+        simpleAuthStorage.updateIfRequired(
+                simpleAuth.requestUrl(),
+                enrichedRequest,
+                response,
+                transactionId
+        );
+
+        return response;
+    }
+
+    /**
+     * 다건 간편인증 완료 요청
+     */
+    public List<EasyCodefResponse> requestMultipleSimpleAuthCertification(String transactionId) throws CodefException {
         CodefSimpleAuth simpleAuth = simpleAuthStorage.get(transactionId);
 
         EasyCodefRequest enrichedRequest = enrichRequestWithTwoWayInfo(simpleAuth);
@@ -71,22 +107,6 @@ public class EasyCodef {
                 : List.of(firstResponse);
     }
 
-    /**
-     * 다중 상품 요청 처리
-     */
-    public EasyCodefResponse requestMultipleProduct(List<EasyCodefRequest> requests) throws CodefException {
-        validateRequests(requests);
-
-        String uuid = UUID.randomUUID().toString();
-        assignSsoId(requests, uuid);
-
-        var executors = createExecutors();
-        try {
-            return processMultipleRequests(requests, executors);
-        } finally {
-            cleanupExecutors(executors);
-        }
-    }
 
     // Private helper methods
 
