@@ -82,6 +82,10 @@ public enum CodefError {
     SIMPLE_AUTH_FAILED(
             "No initial request data is saved for the specified transaction ID.",
             CodefReferenceUrl.TECH_INQUIRY
+    ),
+    NO_RESPONSE_RECEIVED(
+            "No responses were received on multiple request",
+            CodefReferenceUrl.MULTIPLE_REQUEST
     );
 
 
