@@ -12,6 +12,7 @@ import java.security.PublicKey;
 import java.util.*;
 import java.util.concurrent.*;
 
+import static io.codef.api.constants.CodefResponseCode.CF_00000;
 import static io.codef.api.constants.CodefResponseCode.CF_03002;
 import static io.codef.api.dto.EasyCodefRequest.SSO_ID;
 import static io.codef.api.dto.EasyCodefRequest.TRUE;
@@ -40,7 +41,7 @@ public class EasyCodef {
         return easyCodefResponse;
     }
 
-    public EasyCodefResponse requestSimpleAuthCertification(String transactionId) throws CodefException {
+    public List<EasyCodefResponse> requestSimpleAuthCertification(String transactionId) throws CodefException {
         final CodefSimpleAuth codefSimpleAuth = simpleAuthRequestStorage.get(transactionId);
         CodefValidator.requireNonNullElseThrow(codefSimpleAuth, CodefError.SIMPLE_AUTH_FAILED);
 
@@ -50,13 +51,22 @@ public class EasyCodef {
         addTwoWayInfo(request, codefSimpleAuth);
 
         final EasyCodefToken validToken = easyCodefToken.validateAndRefreshToken();
-        final EasyCodefResponse easyCodefResponse = EasyCodefConnector.requestProduct(request, validToken, requestUrl);
+        final EasyCodefResponse firstResponse = EasyCodefConnector.requestProduct(request, validToken, requestUrl);
 
-        updateSimpleAuthResponseRequired(requestUrl, request, easyCodefResponse, transactionId);
-        return easyCodefResponse;
+        updateSimpleAuthResponseRequired(requestUrl, request, firstResponse, transactionId);
+
+        if (firstResponse.code().equals(CF_00000)) {
+            List<EasyCodefResponse> remainingResponses = getRemainingResponse(transactionId);
+            final List<EasyCodefResponse> responses = new ArrayList<>(remainingResponses);
+            responses.add(firstResponse);
+
+            return responses;
+        }
+
+        return List.of(firstResponse);
     }
 
-    public List<EasyCodefResponse> getAddAuthResponse(String transactionId) throws CodefException {
+    private List<EasyCodefResponse> getRemainingResponse(String transactionId) throws CodefException {
         final List<CompletableFuture<EasyCodefResponse>> completableFutures =
                 multipleSimpleAuthRequestStorage.get(transactionId);
 

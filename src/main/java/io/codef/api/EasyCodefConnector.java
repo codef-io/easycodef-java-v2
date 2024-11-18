@@ -9,6 +9,7 @@ import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
 import io.codef.api.util.HttpClientUtil;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 
 import java.nio.charset.StandardCharsets;
@@ -23,6 +24,9 @@ public final class EasyCodefConnector {
     private EasyCodefConnector() {
     }
 
+    /**
+     * 상품 요청
+     */
     public static EasyCodefResponse requestProduct(
             EasyCodefRequest request,
             EasyCodefToken token,
@@ -32,17 +36,21 @@ public final class EasyCodefConnector {
         return executeRequest(httpRequest, responseHandler::handleProductResponse);
     }
 
-    private static HttpPost createTokenRequest(String codefOAuthToken) {
-        HttpPost httpPost = new HttpPost(CodefHost.CODEF_OAUTH_SERVER + CodefPath.ISSUE_TOKEN);
-        httpPost.addHeader(AUTHORIZATION, String.format(BASIC_TOKEN_FORMAT, codefOAuthToken));
-        return httpPost;
-    }
-    
+    /**
+     * 액세스 토큰 요청
+     */
     public static String requestToken(
             String codefOAuthToken
     ) throws CodefException {
         HttpPost request = createTokenRequest(codefOAuthToken);
         return executeRequest(request, responseHandler::handleTokenResponse);
+    }
+
+
+    private static HttpPost createTokenRequest(String codefOAuthToken) {
+        HttpPost httpPost = new HttpPost(CodefHost.CODEF_OAUTH_SERVER + CodefPath.ISSUE_TOKEN);
+        httpPost.addHeader(AUTHORIZATION, String.format(BASIC_TOKEN_FORMAT, codefOAuthToken));
+        return httpPost;
     }
 
     private static HttpPost createProductRequest(
@@ -70,5 +78,10 @@ public final class EasyCodefConnector {
         } catch (Exception e) {
             throw CodefException.of(CodefError.INTERNAL_SERVER_ERROR, e);
         }
+    }
+
+    @FunctionalInterface
+    private interface ResponseProcessor<T> {
+        T process(ClassicHttpResponse response) throws CodefException;
     }
 }
