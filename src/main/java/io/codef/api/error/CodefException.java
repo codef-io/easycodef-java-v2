@@ -43,4 +43,8 @@ public class CodefException extends RuntimeException {
     ) {
         return new CodefException(codefError, extraMessage);
     }
+
+    public CodefError getError() {
+        return codefError;
+    }
 }

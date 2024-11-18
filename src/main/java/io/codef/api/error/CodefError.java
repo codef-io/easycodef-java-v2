@@ -11,10 +11,6 @@ public enum CodefError {
             "clientSecret must be a properly formatted UUID string. Please check your clientSecret and ensure it matches the UUID format.",
             CodefReferenceUrl.KEY
     ),
-    INVALID_PUBLIC_KEY(
-            "publicKey is required and cannot be null.",
-            CodefReferenceUrl.KEY
-    ),
     NULL_CLIENT_ID(
             "clientId is required and cannot be null.",
             CodefReferenceUrl.KEY
