@@ -90,6 +90,10 @@ public enum CodefError {
     NO_RESPONSE_RECEIVED(
             "No responses were received on multiple request",
             CodefReferenceUrl.MULTIPLE_REQUEST
+    ),
+    REQUEST_NULL(
+            "Codef Request Entity is required and cannot be null.",
+            CodefReferenceUrl.WIKI_003
     );
 
 

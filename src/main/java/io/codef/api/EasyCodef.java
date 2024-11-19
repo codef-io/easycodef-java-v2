@@ -5,6 +5,7 @@ import io.codef.api.constants.CodefResponseCode;
 import io.codef.api.dto.CodefSimpleAuth;
 import io.codef.api.dto.EasyCodefRequest;
 import io.codef.api.dto.EasyCodefResponse;
+import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
 import io.codef.api.storage.MultipleRequestStorage;
 import io.codef.api.storage.SimpleAuthStorage;
@@ -55,9 +56,7 @@ public class EasyCodef {
      */
     public EasyCodefResponse requestMultipleProduct(List<EasyCodefRequest> requests) throws CodefException {
         validateRequests(requests);
-
-        String uuid = UUID.randomUUID().toString();
-        assignSsoId(requests, uuid);
+        assignSsoId(requests, UUID.randomUUID().toString());
 
         var executors = createExecutors();
         try {
@@ -146,9 +145,7 @@ public class EasyCodef {
     }
 
     private void validateRequests(List<EasyCodefRequest> requests) {
-        if (requests == null || requests.isEmpty()) {
-            throw new IllegalArgumentException("Requests cannot be null or empty");
-        }
+        requests.forEach(request -> CodefValidator.requireNonNullElseThrow(request, CodefError.REQUEST_NULL));
     }
 
     private void assignSsoId(List<EasyCodefRequest> requests, String uuid) {
