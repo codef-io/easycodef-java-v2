@@ -35,6 +35,10 @@ public enum CodefError {
             "Failed to authenticate with the Codef OAuth server (401 Unauthorized). Please verify your clientId and clientSecret values.",
             CodefReferenceUrl.KEY
     ),
+    CODEF_API_UNAUTHORIZED(
+            "Failed to authenticate with the Codef API server (401 Unauthorized). Please verify your clientId and clientSecret values.",
+            CodefReferenceUrl.KEY
+    ),
     OAUTH_INTERNAL_ERROR(
             "An error occurred on the Codef OAuth server. Please try again later, or contact support if the issue persists.",
             CodefReferenceUrl.KEY
@@ -82,6 +86,10 @@ public enum CodefError {
     SIMPLE_AUTH_FAILED(
             "No initial request data is saved for the specified transaction ID.",
             CodefReferenceUrl.TECH_INQUIRY
+    ),
+    NO_RESPONSE_RECEIVED(
+            "No responses were received on multiple request",
+            CodefReferenceUrl.MULTIPLE_REQUEST
     );
 
 

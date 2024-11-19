@@ -23,6 +23,7 @@ public record EasyCodefRequest(
     /**
      * Request Body Key Constant
      */
+    public static final String SSO_ID = "id";
     public static final String IS_TWO_WAY = "is2Way";
     public static final String SIMPLE_AUTH = "simpleAuth";
     public static final String TWO_WAY_INFO = "twoWayInfo";

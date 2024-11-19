@@ -31,20 +31,16 @@
 
 ### easycodef-java-v2
 
-- **[EasyCodef V2 Wiki](https://github.com/codef-io/easycodef-java-v2/wiki)**
-
-        Latest version support feature
-        본 라이브러리는 현재 알파 버전 개발중인 버전으로, 2025년 상반기 정식 릴리즈 예정입니다.
-
-        → EasyCodef.requestProduct(EasyCodefRequest request) : 비인증 상품 호출
-        → EasyCodef.requestSimpleAuthCertification() : 사용자 본인 인증(간편 인증) 완료 호출
+> [!TIP]
+> - **[EasyCodef V2 Wiki](https://github.com/codef-io/easycodef-java-v2/wiki)**
 
 <br>
 
-- [Codef Homepage](https://codef.io/)
-- [Codef API Developer Guide](https://developer.codef.io/)
-- [Hectodata Homepage](https://hectodata.co.kr/)
-- [Hecto Tech Blog](https://blog.hectodata.co.kr/)
+> [!NOTE]
+> - [Codef Homepage](https://codef.io/)
+> - [Codef API Developer Guide](https://developer.codef.io/)
+> - [Hectodata Homepage](https://hectodata.co.kr/)
+> - [Hecto Tech Blog](https://blog.hectodata.co.kr/)
 
 <br>
 <br>
