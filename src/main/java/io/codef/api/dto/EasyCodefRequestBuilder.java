@@ -1,16 +1,17 @@
 package io.codef.api.dto;
 
+import static io.codef.api.dto.EasyCodefRequest.EASY_CODEF_JAVA_FLAG;
+import static io.codef.api.dto.EasyCodefRequest.ORGANIZATION;
+import static io.codef.api.dto.EasyCodefRequest.PATH_PREFIX;
+
 import io.codef.api.CodefValidator;
 import io.codef.api.EasyCodef;
 import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
 import io.codef.api.util.RsaUtil;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
-import static io.codef.api.dto.EasyCodefRequest.*;
 
 public class EasyCodefRequestBuilder {
 
@@ -30,8 +31,8 @@ public class EasyCodefRequestBuilder {
 
     private static void requireValidPathElseThrow(String path) {
         Optional.of(path)
-                .filter(p -> p.startsWith(PATH_PREFIX))
-                .orElseThrow(() -> CodefException.from(CodefError.INVALID_PATH_REQUESTED));
+            .filter(p -> p.startsWith(PATH_PREFIX))
+            .orElseThrow(() -> CodefException.from(CodefError.INVALID_PATH_REQUESTED));
     }
 
     public EasyCodefRequestBuilder organization(Object value) {
@@ -48,16 +49,16 @@ public class EasyCodefRequestBuilder {
     }
 
     public EasyCodefRequestBuilder requestBody(
-            String param,
-            Object value
+        String param,
+        Object value
     ) {
         generalRequestBody.put(param, value);
         return this;
     }
 
     public EasyCodefRequestBuilder secureRequestBody(
-            String param,
-            String value
+        String param,
+        String value
     ) {
         secureRequestBody.put(param, value);
         return this;
@@ -70,7 +71,8 @@ public class EasyCodefRequestBuilder {
 
     public EasyCodefRequest build() {
         CodefValidator.requireNonNullElseThrow(path, CodefError.NEED_TO_PATH_METHOD);
-        CodefValidator.requireNonNullElseThrow(generalRequestBody.get(ORGANIZATION), CodefError.NEED_TO_ORGANIZATION_METHOD);
+        CodefValidator.requireNonNullElseThrow(generalRequestBody.get(ORGANIZATION),
+            CodefError.NEED_TO_ORGANIZATION_METHOD);
 
         encryptSecureRequestBody();
 
@@ -82,11 +84,12 @@ public class EasyCodefRequestBuilder {
 
     private void encryptSecureRequestBody() {
         Optional.of(secureRequestBody)
-                .filter(body -> !body.isEmpty())
-                .ifPresent(body -> {
-                    CodefValidator.requireNonNullElseThrow(easyCodef, CodefError.NEED_TO_SECURE_WITH_METHOD);
-                    encryptRequestBodyValues(body);
-                });
+            .filter(body -> !body.isEmpty())
+            .ifPresent(body -> {
+                CodefValidator.requireNonNullElseThrow(easyCodef,
+                    CodefError.NEED_TO_SECURE_WITH_METHOD);
+                encryptRequestBodyValues(body);
+            });
     }
 
     private void encryptRequestBodyValues(Map<String, String> body) {

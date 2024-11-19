@@ -4,6 +4,7 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 
 public final class HttpClientUtil {
+
     private HttpClientUtil() {
     }
 
