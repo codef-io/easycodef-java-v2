@@ -11,10 +11,6 @@ public enum CodefError {
             "clientSecret must be a properly formatted UUID string. Please check your clientSecret and ensure it matches the UUID format.",
             CodefReferenceUrl.KEY
     ),
-    INVALID_PUBLIC_KEY(
-            "publicKey is required and cannot be null.",
-            CodefReferenceUrl.KEY
-    ),
     NULL_CLIENT_ID(
             "clientId is required and cannot be null.",
             CodefReferenceUrl.KEY
@@ -37,6 +33,10 @@ public enum CodefError {
     ),
     OAUTH_UNAUTHORIZED(
             "Failed to authenticate with the Codef OAuth server (401 Unauthorized). Please verify your clientId and clientSecret values.",
+            CodefReferenceUrl.KEY
+    ),
+    CODEF_API_UNAUTHORIZED(
+            "Failed to authenticate with the Codef API server (401 Unauthorized). Please verify your clientId and clientSecret values.",
             CodefReferenceUrl.KEY
     ),
     OAUTH_INTERNAL_ERROR(
@@ -86,6 +86,10 @@ public enum CodefError {
     SIMPLE_AUTH_FAILED(
             "No initial request data is saved for the specified transaction ID.",
             CodefReferenceUrl.TECH_INQUIRY
+    ),
+    NO_RESPONSE_RECEIVED(
+            "No responses were received on multiple request",
+            CodefReferenceUrl.MULTIPLE_REQUEST
     );
 
 

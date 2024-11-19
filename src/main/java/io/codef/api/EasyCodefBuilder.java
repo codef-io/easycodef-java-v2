@@ -17,7 +17,7 @@ public class EasyCodefBuilder {
     }
 
     public EasyCodefBuilder publicKey(String publicKey) {
-        this.publicKey = CodefValidator.requireNonNullElseThrow(publicKey, CodefError.INVALID_PUBLIC_KEY);
+        this.publicKey = CodefValidator.requireNonNullElseThrow(publicKey, CodefError.NULL_PUBLIC_KEY);
         return this;
     }
 

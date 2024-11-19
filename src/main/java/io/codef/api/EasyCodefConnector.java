@@ -9,20 +9,25 @@ import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
 import io.codef.api.util.HttpClientUtil;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import static io.codef.api.dto.EasyCodefRequest.BASIC_TOKEN_FORMAT;
 import static io.codef.api.dto.EasyCodefRequest.BEARER_TOKEN_FORMAT;
 import static org.apache.hc.core5.http.HttpHeaders.AUTHORIZATION;
 
-public final class EasyCodefConnector {
+public class EasyCodefConnector {
     private static final ResponseHandler responseHandler = new ResponseHandler();
 
     private EasyCodefConnector() {
     }
 
+    /**
+     * 상품 요청
+     */
     public static EasyCodefResponse requestProduct(
             EasyCodefRequest request,
             EasyCodefToken token,
@@ -32,17 +37,21 @@ public final class EasyCodefConnector {
         return executeRequest(httpRequest, responseHandler::handleProductResponse);
     }
 
-    private static HttpPost createTokenRequest(String codefOAuthToken) {
-        HttpPost httpPost = new HttpPost(CodefHost.CODEF_OAUTH_SERVER + CodefPath.ISSUE_TOKEN);
-        httpPost.addHeader(AUTHORIZATION, String.format(BASIC_TOKEN_FORMAT, codefOAuthToken));
-        return httpPost;
-    }
-    
+    /**
+     * 액세스 토큰 요청
+     */
     public static String requestToken(
             String codefOAuthToken
     ) throws CodefException {
         HttpPost request = createTokenRequest(codefOAuthToken);
         return executeRequest(request, responseHandler::handleTokenResponse);
+    }
+
+
+    private static HttpPost createTokenRequest(String codefOAuthToken) {
+        HttpPost httpPost = new HttpPost(CodefHost.CODEF_OAUTH_SERVER + CodefPath.ISSUE_TOKEN);
+        httpPost.addHeader(AUTHORIZATION, String.format(BASIC_TOKEN_FORMAT, codefOAuthToken));
+        return httpPost;
     }
 
     private static HttpPost createProductRequest(
@@ -65,10 +74,13 @@ public final class EasyCodefConnector {
     ) {
         try (var httpClient = HttpClientUtil.createClient()) {
             return httpClient.execute(request, processor::process);
-        } catch (CodefException e) {
-            throw e;
-        } catch (Exception e) {
-            throw CodefException.of(CodefError.INTERNAL_SERVER_ERROR, e);
+        } catch (IOException exception) {
+            throw CodefException.of(CodefError.IO_ERROR, exception);
         }
+    }
+
+    @FunctionalInterface
+    private interface ResponseProcessor<T> {
+        T process(ClassicHttpResponse response) throws CodefException;
     }
 }
