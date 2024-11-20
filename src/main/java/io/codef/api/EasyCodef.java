@@ -28,6 +28,7 @@ import java.util.stream.IntStream;
 public class EasyCodef {
 
     private static final long REQUEST_DELAY_MS = 700L;
+
     private final SimpleAuthStorage simpleAuthStorage;
     private final MultipleRequestStorage multipleRequestStorage;
     private final PublicKey publicKey;

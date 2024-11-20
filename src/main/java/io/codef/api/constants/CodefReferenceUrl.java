@@ -10,6 +10,9 @@ public enum CodefReferenceUrl {
 
     WIKI_003(
         "https://github.com/codef-io/easycodef-java-v2/wiki/003.-%EC%83%81%ED%92%88-%EC%9A%94%EC%B2%AD-%EA%B0%9D%EC%B2%B4-%EC%83%9D%EC%84%B1"
+    ),
+    WIKI_005(
+        "https://github.com/codef-io/easycodef-java-v2/wiki/005.-%EC%B6%94%EA%B0%80%EC%9D%B8%EC%A6%9D-%EC%9A%94%EC%B2%AD-(CF%E2%80%9003002)"
     );
 
     private static final String MESSAGE_FORMAT = "→ For detailed information, please visit '%s'";

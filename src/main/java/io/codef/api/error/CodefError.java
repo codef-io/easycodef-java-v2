@@ -94,6 +94,10 @@ public enum CodefError {
     REQUEST_NULL(
         "Codef Request Entity is required and cannot be null.",
         CodefReferenceUrl.WIKI_003
+    ),
+    TRANSACTION_ID_NULL(
+        "transactionId is required and cannot be null.",
+        CodefReferenceUrl.WIKI_005
     );
 
 
