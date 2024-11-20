@@ -1,35 +1,44 @@
 package io.codef.api;
 
+import static io.codef.api.dto.EasyCodefRequest.SSO_ID;
+import static io.codef.api.dto.EasyCodefRequest.TRUE;
+
 import io.codef.api.constants.CodefClientType;
 import io.codef.api.constants.CodefResponseCode;
 import io.codef.api.dto.CodefSimpleAuth;
 import io.codef.api.dto.EasyCodefRequest;
 import io.codef.api.dto.EasyCodefResponse;
+import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
 import io.codef.api.storage.MultipleRequestStorage;
 import io.codef.api.storage.SimpleAuthStorage;
 import io.codef.api.util.RsaUtil;
-
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
-import static io.codef.api.dto.EasyCodefRequest.SSO_ID;
-import static io.codef.api.dto.EasyCodefRequest.TRUE;
-
 public class EasyCodef {
+
     private static final long REQUEST_DELAY_MS = 700L;
+
     private final SimpleAuthStorage simpleAuthStorage;
     private final MultipleRequestStorage multipleRequestStorage;
     private final PublicKey publicKey;
     private final CodefClientType clientType;
     private final EasyCodefToken easyCodefToken;
 
-    protected EasyCodef(EasyCodefBuilder builder, EasyCodefToken easyCodefToken) {
+    protected EasyCodef(
+        EasyCodefBuilder builder,
+        EasyCodefToken easyCodefToken
+    ) {
         this.publicKey = RsaUtil.generatePublicKey(builder.getPublicKey());
         this.clientType = builder.getClientType();
         this.easyCodefToken = easyCodefToken;
@@ -44,7 +53,8 @@ public class EasyCodef {
         String requestUrl = buildRequestUrl(request);
         EasyCodefToken validToken = easyCodefToken.validateAndRefreshToken();
 
-        EasyCodefResponse response = EasyCodefConnector.requestProduct(request, validToken, requestUrl);
+        EasyCodefResponse response = EasyCodefConnector.requestProduct(request, validToken,
+            requestUrl);
         simpleAuthStorage.storeIfRequired(request, response, requestUrl);
 
         return response;
@@ -53,11 +63,10 @@ public class EasyCodef {
     /**
      * 다중 상품 요청
      */
-    public EasyCodefResponse requestMultipleProduct(List<EasyCodefRequest> requests) throws CodefException {
+    public EasyCodefResponse requestMultipleProduct(List<EasyCodefRequest> requests)
+        throws CodefException {
         validateRequests(requests);
-
-        String uuid = UUID.randomUUID().toString();
-        assignSsoId(requests, uuid);
+        assignSsoId(requests, UUID.randomUUID().toString());
 
         var executors = createExecutors();
         try {
@@ -70,17 +79,19 @@ public class EasyCodef {
     /**
      * 단건 간편인증 완료 요청
      */
-    public EasyCodefResponse requestSimpleAuthCertification(String transactionId) throws CodefException {
+    public EasyCodefResponse requestSimpleAuthCertification(String transactionId)
+        throws CodefException {
         CodefSimpleAuth simpleAuth = simpleAuthStorage.get(transactionId);
 
         EasyCodefRequest enrichedRequest = enrichRequestWithTwoWayInfo(simpleAuth);
-        EasyCodefResponse response = executeSimpleAuthRequest(enrichedRequest, simpleAuth.requestUrl());
+        EasyCodefResponse response = executeSimpleAuthRequest(enrichedRequest,
+            simpleAuth.requestUrl());
 
         simpleAuthStorage.updateIfRequired(
-                simpleAuth.requestUrl(),
-                enrichedRequest,
-                response,
-                transactionId
+            simpleAuth.requestUrl(),
+            enrichedRequest,
+            response,
+            transactionId
         );
 
         return response;
@@ -89,24 +100,25 @@ public class EasyCodef {
     /**
      * 다건 간편인증 완료 요청
      */
-    public List<EasyCodefResponse> requestMultipleSimpleAuthCertification(String transactionId) throws CodefException {
+    public List<EasyCodefResponse> requestMultipleSimpleAuthCertification(String transactionId)
+        throws CodefException {
         CodefSimpleAuth simpleAuth = simpleAuthStorage.get(transactionId);
 
         EasyCodefRequest enrichedRequest = enrichRequestWithTwoWayInfo(simpleAuth);
-        EasyCodefResponse firstResponse = executeSimpleAuthRequest(enrichedRequest, simpleAuth.requestUrl());
+        EasyCodefResponse firstResponse = executeSimpleAuthRequest(enrichedRequest,
+            simpleAuth.requestUrl());
 
         simpleAuthStorage.updateIfRequired(
-                simpleAuth.requestUrl(),
-                enrichedRequest,
-                firstResponse,
-                transactionId
+            simpleAuth.requestUrl(),
+            enrichedRequest,
+            firstResponse,
+            transactionId
         );
 
         return isSuccessful(firstResponse)
-                ? combineWithRemainingResponses(firstResponse, transactionId)
-                : List.of(firstResponse);
+            ? combineWithRemainingResponses(firstResponse, transactionId)
+            : List.of(firstResponse);
     }
-
 
     // Private helper methods
 
@@ -125,8 +137,10 @@ public class EasyCodef {
         return request;
     }
 
-    private EasyCodefResponse executeSimpleAuthRequest(EasyCodefRequest request, String requestUrl)
-            throws CodefException {
+    private EasyCodefResponse executeSimpleAuthRequest(
+        EasyCodefRequest request,
+        String requestUrl
+    ) throws CodefException {
         EasyCodefToken validToken = easyCodefToken.validateAndRefreshToken();
         return EasyCodefConnector.requestProduct(request, validToken, requestUrl);
     }
@@ -136,19 +150,19 @@ public class EasyCodef {
     }
 
     private List<EasyCodefResponse> combineWithRemainingResponses(
-            EasyCodefResponse firstResponse,
-            String transactionId
+        EasyCodefResponse firstResponse,
+        String transactionId
     ) throws CodefException {
-        List<EasyCodefResponse> remainingResponses = multipleRequestStorage.getRemainingResponses(transactionId);
+        List<EasyCodefResponse> remainingResponses = multipleRequestStorage.getRemainingResponses(
+            transactionId);
         List<EasyCodefResponse> allResponses = new ArrayList<>(remainingResponses);
         allResponses.add(firstResponse);
         return allResponses;
     }
 
     private void validateRequests(List<EasyCodefRequest> requests) {
-        if (requests == null || requests.isEmpty()) {
-            throw new IllegalArgumentException("Requests cannot be null or empty");
-        }
+        requests.forEach(
+            request -> CodefValidator.requireNonNullElseThrow(request, CodefError.REQUEST_NULL));
     }
 
     private void assignSsoId(List<EasyCodefRequest> requests, String uuid) {
@@ -157,19 +171,20 @@ public class EasyCodef {
 
     private CodefExecutors createExecutors() {
         return new CodefExecutors(
-                Executors.newScheduledThreadPool(1),
-                Executors.newThreadPerTaskExecutor(Thread.ofVirtual().factory())
+            Executors.newScheduledThreadPool(1),
+            Executors.newThreadPerTaskExecutor(Thread.ofVirtual().factory())
         );
     }
 
     private EasyCodefResponse processMultipleRequests(
-            List<EasyCodefRequest> requests,
-            CodefExecutors codefExecutors
+        List<EasyCodefRequest> requests,
+        CodefExecutors codefExecutors
     ) throws CodefException {
-        List<CompletableFuture<EasyCodefResponse>> futures = scheduleRequests(requests, codefExecutors);
+        List<CompletableFuture<EasyCodefResponse>> futures = scheduleRequests(requests,
+            codefExecutors);
 
         CompletableFuture<EasyCodefResponse> firstCompleted = CompletableFuture.anyOf(
-                futures.toArray(new CompletableFuture[0])
+            futures.toArray(new CompletableFuture[0])
         ).thenApply(result -> (EasyCodefResponse) result);
 
         EasyCodefResponse result = firstCompleted.join();
@@ -179,34 +194,34 @@ public class EasyCodef {
     }
 
     private List<CompletableFuture<EasyCodefResponse>> scheduleRequests(
-            List<EasyCodefRequest> requests,
-            CodefExecutors codefExecutors
+        List<EasyCodefRequest> requests,
+        CodefExecutors codefExecutors
     ) {
         return IntStream.range(0, requests.size())
-                .mapToObj(i -> scheduleRequest(requests.get(i), i * REQUEST_DELAY_MS, codefExecutors))
-                .toList();
+            .mapToObj(i -> scheduleRequest(requests.get(i), i * REQUEST_DELAY_MS, codefExecutors))
+            .toList();
     }
 
     private CompletableFuture<EasyCodefResponse> scheduleRequest(
-            EasyCodefRequest request,
-            long delayMs,
-            CodefExecutors codefExecutors
+        EasyCodefRequest request,
+        long delayMs,
+        CodefExecutors codefExecutors
     ) {
         CompletableFuture<EasyCodefResponse> future = new CompletableFuture<>();
 
         codefExecutors.scheduler.schedule(
-                () -> executeRequest(request, codefExecutors.virtualThreadExecutor, future),
-                delayMs,
-                TimeUnit.MILLISECONDS
+            () -> executeRequest(request, codefExecutors.virtualThreadExecutor, future),
+            delayMs,
+            TimeUnit.MILLISECONDS
         );
 
         return future;
     }
 
     private void executeRequest(
-            EasyCodefRequest request,
-            Executor executor,
-            CompletableFuture<EasyCodefResponse> future
+        EasyCodefRequest request,
+        Executor executor,
+        CompletableFuture<EasyCodefResponse> future
     ) {
         CompletableFuture.supplyAsync(() -> {
             try {
@@ -232,8 +247,9 @@ public class EasyCodef {
     }
 
     private record CodefExecutors(
-            ScheduledExecutorService scheduler,
-            Executor virtualThreadExecutor
+        ScheduledExecutorService scheduler,
+        Executor virtualThreadExecutor
     ) {
+
     }
 }

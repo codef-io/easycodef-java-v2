@@ -2,18 +2,21 @@ package io.codef.api.util;
 
 import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
-
-import javax.crypto.Cipher;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
+import javax.crypto.Cipher;
 
 public class RsaUtil {
+
     private RsaUtil() {
     }
 
-    public static String encryptRSA(String plainText, PublicKey publicKey) {
+    public static String encryptRSA(
+        String plainText,
+        PublicKey publicKey
+    ) {
         try {
             Cipher cipher = initializeCipher(publicKey);
 

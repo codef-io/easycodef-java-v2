@@ -3,10 +3,10 @@ package io.codef.api;
 import io.codef.api.constants.CodefClientType;
 import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
-
 import java.util.UUID;
 
 public class EasyCodefBuilder {
+
     private String publicKey;
     private UUID clientId;
     private UUID clientSecret;
@@ -17,7 +17,8 @@ public class EasyCodefBuilder {
     }
 
     public EasyCodefBuilder publicKey(String publicKey) {
-        this.publicKey = CodefValidator.requireNonNullElseThrow(publicKey, CodefError.NULL_PUBLIC_KEY);
+        this.publicKey = CodefValidator.requireNonNullElseThrow(publicKey,
+            CodefError.NULL_PUBLIC_KEY);
         return this;
     }
 

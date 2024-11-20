@@ -12,11 +12,21 @@ public class CodefException extends RuntimeException {
     private final CodefError codefError;
 
     private CodefException(CodefError codefError, Exception exception) {
-        super(String.format(LOG_WITH_CAUSE_FORMAT, codefError.getMessage(), exception.getMessage()), exception);
+        super(
+            String.format(
+                LOG_WITH_CAUSE_FORMAT,
+                codefError.getMessage(),
+                exception.getMessage()
+            ),
+            exception
+        );
         this.codefError = codefError;
     }
 
-    private CodefException(CodefError codefError, String extraMessage) {
+    private CodefException(
+        CodefError codefError,
+        String extraMessage
+    ) {
         super(codefError.getMessage() + '\n' + extraMessage);
         this.codefError = codefError;
     }
@@ -31,15 +41,15 @@ public class CodefException extends RuntimeException {
     }
 
     public static CodefException of(
-            CodefError codefError,
-            Exception exception
+        CodefError codefError,
+        Exception exception
     ) {
         return new CodefException(codefError, exception);
     }
 
     public static CodefException of(
-            CodefError codefError,
-            String extraMessage
+        CodefError codefError,
+        String extraMessage
     ) {
         return new CodefException(codefError, extraMessage);
     }
