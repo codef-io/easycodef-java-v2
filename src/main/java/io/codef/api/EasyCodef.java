@@ -35,7 +35,10 @@ public class EasyCodef {
     private final CodefClientType clientType;
     private final EasyCodefToken easyCodefToken;
 
-    protected EasyCodef(EasyCodefBuilder builder, EasyCodefToken easyCodefToken) {
+    protected EasyCodef(
+        EasyCodefBuilder builder,
+        EasyCodefToken easyCodefToken
+    ) {
         this.publicKey = RsaUtil.generatePublicKey(builder.getPublicKey());
         this.clientType = builder.getClientType();
         this.easyCodefToken = easyCodefToken;
@@ -134,8 +137,10 @@ public class EasyCodef {
         return request;
     }
 
-    private EasyCodefResponse executeSimpleAuthRequest(EasyCodefRequest request, String requestUrl)
-        throws CodefException {
+    private EasyCodefResponse executeSimpleAuthRequest(
+        EasyCodefRequest request,
+        String requestUrl
+    ) throws CodefException {
         EasyCodefToken validToken = easyCodefToken.validateAndRefreshToken();
         return EasyCodefConnector.requestProduct(request, validToken, requestUrl);
     }

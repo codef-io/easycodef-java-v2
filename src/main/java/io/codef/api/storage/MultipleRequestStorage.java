@@ -14,8 +14,9 @@ public class MultipleRequestStorage {
 
     private final Map<String, List<CompletableFuture<EasyCodefResponse>>> storage = new HashMap<>();
 
-    public List<EasyCodefResponse> getRemainingResponses(String transactionId)
-        throws CodefException {
+    public List<EasyCodefResponse> getRemainingResponses(
+        String transactionId
+    ) throws CodefException {
         final List<CompletableFuture<EasyCodefResponse>> futures = storage.get(transactionId);
         CodefValidator.requireNonNullElseThrow(futures, CodefError.SIMPLE_AUTH_FAILED);
 

@@ -13,7 +13,10 @@ public class RsaUtil {
     private RsaUtil() {
     }
 
-    public static String encryptRSA(String plainText, PublicKey publicKey) {
+    public static String encryptRSA(
+        String plainText,
+        PublicKey publicKey
+    ) {
         try {
             Cipher cipher = initializeCipher(publicKey);
 

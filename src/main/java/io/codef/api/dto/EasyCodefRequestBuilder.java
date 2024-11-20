@@ -71,8 +71,9 @@ public class EasyCodefRequestBuilder {
 
     public EasyCodefRequest build() {
         CodefValidator.requireNonNullElseThrow(path, CodefError.NEED_TO_PATH_METHOD);
-        CodefValidator.requireNonNullElseThrow(generalRequestBody.get(ORGANIZATION),
-            CodefError.NEED_TO_ORGANIZATION_METHOD);
+        CodefValidator.requireNonNullElseThrow(
+            generalRequestBody.get(ORGANIZATION), CodefError.NEED_TO_ORGANIZATION_METHOD
+        );
 
         encryptSecureRequestBody();
 
@@ -86,8 +87,10 @@ public class EasyCodefRequestBuilder {
         Optional.of(secureRequestBody)
             .filter(body -> !body.isEmpty())
             .ifPresent(body -> {
-                CodefValidator.requireNonNullElseThrow(easyCodef,
-                    CodefError.NEED_TO_SECURE_WITH_METHOD);
+                CodefValidator.requireNonNullElseThrow(
+                    easyCodef,
+                    CodefError.NEED_TO_SECURE_WITH_METHOD
+                );
                 encryptRequestBodyValues(body);
             });
     }

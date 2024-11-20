@@ -12,12 +12,21 @@ public class CodefException extends RuntimeException {
     private final CodefError codefError;
 
     private CodefException(CodefError codefError, Exception exception) {
-        super(String.format(LOG_WITH_CAUSE_FORMAT, codefError.getMessage(), exception.getMessage()),
-            exception);
+        super(
+            String.format(
+                LOG_WITH_CAUSE_FORMAT,
+                codefError.getMessage(),
+                exception.getMessage()
+            ),
+            exception
+        );
         this.codefError = codefError;
     }
 
-    private CodefException(CodefError codefError, String extraMessage) {
+    private CodefException(
+        CodefError codefError,
+        String extraMessage
+    ) {
         super(codefError.getMessage() + '\n' + extraMessage);
         this.codefError = codefError;
     }
