@@ -42,7 +42,7 @@
 
 <br>
 
-> **Contributors**<br><br>
+> 🤠&nbsp;**Contributors**<br><br>
 > <a href="https://github.com/codef-io/easycodef-java-v2/graphs/contributors">
 > <img width="30px" src="https://contrib.rocks/image?repo=codef-io/easycodef-java-v2" />
 > </a>
