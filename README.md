@@ -4,9 +4,10 @@
   <a title="코드에프" href="https://codef.io/">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/d83f0450-d84e-4594-8fc0-ed08a1d05390">
-      <img alt="코드에프" src="https://github.com/user-attachments/assets/d83f0450-d84e-4594-8fc0-ed08a1d05390" width="250">
+      <img alt="코드에프" src="https://github.com/user-attachments/assets/cd2e9709-742f-4e27-b695-4515bdbb7cc0" width="250">
     </picture>
   </a>
+</p>
 </p>
 
 <br>
