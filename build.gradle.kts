@@ -65,37 +65,16 @@ mavenPublishing {
 
 
 dependencies {
-
-    /**
-     * 2024-10-29 Latest
-     * https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-     */
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.1")
-
-    /**
-     * 2024-10-17 Latest
-     */
     implementation("com.alibaba:fastjson:2.0.53")
-
-    /**
-     * 2024-06-12 Latest
-     * https://mvnrepository.com/artifact/commons-codec/commons-codec
-     */
     implementation("commons-codec:commons-codec:1.17.1")
 
-    /**
-     * 2024-10-28 Latest
-     * https://mvnrepository.com/artifact/org.apache.httpcomponents.client5/httpclient5/5.4.1
-     * https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j2-impl
-     */
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.4.1")
-    implementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.1")
 
-    /**
-     * 2024-10-21 Latest
-     * https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
-     * https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-     */
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.4.1")
+    implementation("ch.qos.logback:logback-classic:1.5.12")
+    implementation("ch.qos.logback:logback-core:1.5.12")
+    implementation("org.slf4j:slf4j-api:2.0.16")
+
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.3")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.3")
 }
