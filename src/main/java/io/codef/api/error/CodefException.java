@@ -1,12 +1,15 @@
 package io.codef.api.error;
 
 import java.io.Serial;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CodefException extends RuntimeException {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    private static final Logger log = LoggerFactory.getLogger(CodefException.class);
     private static final String LOG_WITH_CAUSE_FORMAT = "%s\n→ %s\n\n";
 
     private final CodefError codefError;
@@ -21,6 +24,9 @@ public class CodefException extends RuntimeException {
             exception
         );
         this.codefError = codefError;
+
+        log.error(codefError.getMessage());
+        log.error(exception.getMessage());
     }
 
     private CodefException(
@@ -28,11 +34,17 @@ public class CodefException extends RuntimeException {
         String extraMessage
     ) {
         super(codefError.getMessage() + '\n' + extraMessage);
+        log.error(codefError.getMessage());
+        log.error(extraMessage);
         this.codefError = codefError;
     }
 
     private CodefException(CodefError codefError) {
         super(codefError.getMessage() + '\n');
+
+        log.error("{}", codefError.getRawMessage());
+        log.error("{}", codefError.getReferenceUrl().getRawUrl());
+
         this.codefError = codefError;
     }
 

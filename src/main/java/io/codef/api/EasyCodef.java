@@ -24,10 +24,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EasyCodef {
 
     private static final long REQUEST_DELAY_MS = 700L;
+    private static final Logger log = LoggerFactory.getLogger(EasyCodef.class);
 
     private final SimpleAuthStorage simpleAuthStorage;
     private final MultipleRequestStorage multipleRequestStorage;
@@ -35,15 +38,30 @@ public class EasyCodef {
     private final CodefClientType clientType;
     private final EasyCodefToken easyCodefToken;
 
-    protected EasyCodef(
-        EasyCodefBuilder builder,
-        EasyCodefToken easyCodefToken
-    ) {
+    protected EasyCodef(EasyCodefBuilder builder) {
+
         this.publicKey = RsaUtil.generatePublicKey(builder.getPublicKey());
+        log.info("EasyCodef RSA public key successfully initialized.");
+
         this.clientType = builder.getClientType();
-        this.easyCodefToken = easyCodefToken;
+        log.info("Your Codef clientType {} is successfully initialized.", clientType);
+
+        this.easyCodefToken = new EasyCodefToken(builder);
         this.simpleAuthStorage = new SimpleAuthStorage();
         this.multipleRequestStorage = new MultipleRequestStorage();
+
+        log.info("==================================================");
+        log.info("Your EasyCodef Entity is successfully initialized!");
+        log.info("==================================================\n");
+    }
+
+    private List<EasyCodefResponse> returnFirstErrorResponse(
+        EasyCodefResponse firstResponse,
+        String transactionId
+    ) {
+        log.info("Result Status Code : {}", firstResponse.code());
+
+        return List.of(firstResponse);
     }
 
     /**
@@ -53,10 +71,10 @@ public class EasyCodef {
         String requestUrl = buildRequestUrl(request);
         EasyCodefToken validToken = easyCodefToken.validateAndRefreshToken();
 
-        EasyCodefResponse response = EasyCodefConnector.requestProduct(request, validToken,
-            requestUrl);
-        simpleAuthStorage.storeIfRequired(request, response, requestUrl);
+        EasyCodefResponse response =
+            EasyCodefConnector.requestProduct(request, validToken, requestUrl);
 
+        simpleAuthStorage.storeIfRequired(request, response, requestUrl);
         return response;
     }
 
@@ -66,9 +84,11 @@ public class EasyCodef {
     public EasyCodefResponse requestMultipleProduct(List<EasyCodefRequest> requests)
         throws CodefException {
         validateRequests(requests);
+        easyCodefToken.validateAndRefreshToken();
         assignSsoId(requests, UUID.randomUUID().toString());
 
         var executors = createExecutors();
+
         try {
             return processMultipleRequests(requests, executors);
         } finally {
@@ -82,6 +102,7 @@ public class EasyCodef {
     public EasyCodefResponse requestSimpleAuthCertification(String transactionId)
         throws CodefException {
         CodefSimpleAuth simpleAuth = simpleAuthStorage.get(transactionId);
+        easyCodefToken.validateAndRefreshToken();
 
         EasyCodefRequest enrichedRequest = enrichRequestWithTwoWayInfo(simpleAuth);
         EasyCodefResponse response = executeSimpleAuthRequest(enrichedRequest,
@@ -94,6 +115,8 @@ public class EasyCodef {
             transactionId
         );
 
+        log.info("Result Status Code : {}", response.code());
+
         return response;
     }
 
@@ -103,10 +126,11 @@ public class EasyCodef {
     public List<EasyCodefResponse> requestMultipleSimpleAuthCertification(String transactionId)
         throws CodefException {
         CodefSimpleAuth simpleAuth = simpleAuthStorage.get(transactionId);
+        easyCodefToken.validateAndRefreshToken();
 
         EasyCodefRequest enrichedRequest = enrichRequestWithTwoWayInfo(simpleAuth);
-        EasyCodefResponse firstResponse = executeSimpleAuthRequest(enrichedRequest,
-            simpleAuth.requestUrl());
+        EasyCodefResponse firstResponse =
+            executeSimpleAuthRequest(enrichedRequest, simpleAuth.requestUrl());
 
         simpleAuthStorage.updateIfRequired(
             simpleAuth.requestUrl(),
@@ -116,8 +140,8 @@ public class EasyCodef {
         );
 
         return isSuccessful(firstResponse)
-            ? combineWithRemainingResponses(firstResponse, transactionId)
-            : List.of(firstResponse);
+            ? combineWithRemainingResponses(firstResponse, transactionId) // Case CF-00000
+            : returnFirstErrorResponse(firstResponse, transactionId);
     }
 
     // Private helper methods
@@ -153,10 +177,20 @@ public class EasyCodef {
         EasyCodefResponse firstResponse,
         String transactionId
     ) throws CodefException {
-        List<EasyCodefResponse> remainingResponses = multipleRequestStorage.getRemainingResponses(
-            transactionId);
+
+        log.info("remainingResponses called By transactionId `{}`", transactionId);
+
+        List<EasyCodefResponse> remainingResponses =
+            multipleRequestStorage.getRemainingResponses(transactionId);
+
+        log.info("Await Response Count = {}", remainingResponses.size());
         List<EasyCodefResponse> allResponses = new ArrayList<>(remainingResponses);
         allResponses.add(firstResponse);
+
+        log.info("Total Response Count = {}", allResponses.size());
+        log.info("Result Status Codes : {}",
+            allResponses.stream().map(EasyCodefResponse::code).toList());
+
         return allResponses;
     }
 
@@ -180,12 +214,12 @@ public class EasyCodef {
         List<EasyCodefRequest> requests,
         CodefExecutors codefExecutors
     ) throws CodefException {
-        List<CompletableFuture<EasyCodefResponse>> futures = scheduleRequests(requests,
-            codefExecutors);
+        List<CompletableFuture<EasyCodefResponse>> futures =
+            scheduleRequests(requests, codefExecutors);
 
-        CompletableFuture<EasyCodefResponse> firstCompleted = CompletableFuture.anyOf(
-            futures.toArray(new CompletableFuture[0])
-        ).thenApply(result -> (EasyCodefResponse) result);
+        CompletableFuture<EasyCodefResponse> firstCompleted =
+            CompletableFuture.anyOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(result -> (EasyCodefResponse) result);
 
         EasyCodefResponse result = firstCompleted.join();
         multipleRequestStorage.store(result.transactionId(), futures);

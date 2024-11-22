@@ -116,4 +116,12 @@ public enum CodefError {
     public String getMessage() {
         return String.format(MESSAGE_FORMAT, message, referenceUrl.getUrl());
     }
+
+    public String getRawMessage() {
+        return message;
+    }
+
+    public CodefReferenceUrl getReferenceUrl() {
+        return referenceUrl;
+    }
 }

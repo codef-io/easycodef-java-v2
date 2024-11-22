@@ -39,9 +39,8 @@ public class EasyCodefBuilder {
 
     public EasyCodef build() {
         validatePropertyArguments();
-        EasyCodefToken easyCodefToken = new EasyCodefToken(this);
 
-        return new EasyCodef(this, easyCodefToken);
+        return new EasyCodef(this);
     }
 
     private void validatePropertyArguments() {
