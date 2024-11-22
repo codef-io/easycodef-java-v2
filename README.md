@@ -30,16 +30,9 @@
 
 <br><br>
 
-> [!TIP]
-> - **[EasyCodef V2 Wiki](https://github.com/codef-io/easycodef-java-v2/wiki)**
-
-<br>
-
-> [!NOTE]
-> - [Codef Homepage](https://codef.io/)
+> [!IMPORTANT]
+> - **[EasyCodef Java V2 Wiki Guide Docs](https://github.com/codef-io/easycodef-java-v2/wiki)**
 > - [Codef API Developer Guide](https://developer.codef.io/)
-> - [Hectodata Homepage](https://hectodata.co.kr/)
-> - [Hecto Tech Blog](https://blog.hectodata.co.kr/)
 
 <br>
 
