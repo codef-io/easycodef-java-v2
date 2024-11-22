@@ -12,8 +12,12 @@ import io.codef.api.util.RsaUtil;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EasyCodefRequestBuilder {
+
+    private static final Logger log = LoggerFactory.getLogger(EasyCodefRequestBuilder.class);
 
     private final HashMap<String, Object> generalRequestBody;
     private final HashMap<String, String> secureRequestBody;
@@ -80,7 +84,13 @@ public class EasyCodefRequestBuilder {
         this.requestBody(EASY_CODEF_JAVA_FLAG, true);
         this.generalRequestBody.putAll(secureRequestBody);
 
-        return new EasyCodefRequest(path, generalRequestBody);
+        EasyCodefRequest easyCodefRequest = new EasyCodefRequest(path, generalRequestBody);
+
+//        log.info("[EasyCodef] request object has been successfully built [ {} ]");
+//        log.info(">> path = {}", path);
+//        log.info(">> requestBody = {}", generalRequestBody);
+
+        return easyCodefRequest;
     }
 
     private void encryptSecureRequestBody() {

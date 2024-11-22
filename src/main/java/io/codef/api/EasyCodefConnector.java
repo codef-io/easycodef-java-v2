@@ -11,15 +11,19 @@ import io.codef.api.dto.EasyCodefRequest;
 import io.codef.api.dto.EasyCodefResponse;
 import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
+import io.codef.api.logger.JsonLogUtil;
 import io.codef.api.util.HttpClientUtil;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EasyCodefConnector {
 
+    private static final Logger log = LoggerFactory.getLogger(EasyCodefConnector.class);
     private static final ResponseHandler responseHandler = new ResponseHandler();
 
     private EasyCodefConnector() {
@@ -74,7 +78,19 @@ public class EasyCodefConnector {
         ResponseProcessor<T> processor
     ) {
         try (var httpClient = HttpClientUtil.createClient()) {
-            return httpClient.execute(request, processor::process);
+            log.info("[{}] Codef API Request", request.hashCode());
+            log.info("> Request Host : {}://{}", request.getScheme(),
+                request.getAuthority().toString());
+            log.info("> Requset Uri : {}\n", request.getRequestUri());
+
+            return httpClient.execute(request, response -> {
+                log.info("[{}] Codef API Response", request.hashCode());
+                log.info("> Response Status : {}", response.getCode());
+                T result = processor.process(response);
+                log.info("> Response →\n{}\n", JsonLogUtil.toPrettyJson(result));
+
+                return result;
+            });
         } catch (IOException exception) {
             throw CodefException.of(CodefError.IO_ERROR, exception);
         }
