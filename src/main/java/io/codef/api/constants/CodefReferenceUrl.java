@@ -25,4 +25,8 @@ public enum CodefReferenceUrl {
     public String getUrl() {
         return String.format(MESSAGE_FORMAT, url);
     }
+
+    public String getRawUrl() {
+        return url;
+    }
 }
