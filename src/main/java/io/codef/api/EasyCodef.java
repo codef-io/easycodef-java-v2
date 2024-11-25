@@ -1,5 +1,7 @@
 package io.codef.api;
 
+import static io.codef.api.constants.CodefResponseCode.CF_03002;
+import static io.codef.api.constants.CodefResponseCode.CF_12872;
 import static io.codef.api.dto.EasyCodefRequest.SSO_ID;
 import static io.codef.api.dto.EasyCodefRequest.TRUE;
 
@@ -59,8 +61,19 @@ public class EasyCodef {
         EasyCodefResponse firstResponse,
         String transactionId
     ) {
-        log.info("Result Status Code : {}", firstResponse.code());
-
+        String resultStatusCode = firstResponse.code();
+        log.info("Result Status Code : {}", resultStatusCode);
+        if (resultStatusCode.equals(CF_03002)) {
+            log.warn("Transaction Id : {}", transactionId);
+            log.warn(
+                "The end user has not completed the additional authentication. Recheck the end user's simple authentication status."
+            );
+        } else if (resultStatusCode.equals(CF_12872)) {
+            log.warn("Transaction Id : {}", transactionId);
+            log.warn(
+                " Retry limit for additional authentication exceeded. Please restart the process from the initial request."
+            );
+        }
         return List.of(firstResponse);
     }
 
@@ -105,8 +118,10 @@ public class EasyCodef {
         easyCodefToken.validateAndRefreshToken();
 
         EasyCodefRequest enrichedRequest = enrichRequestWithTwoWayInfo(simpleAuth);
-        EasyCodefResponse response = executeSimpleAuthRequest(enrichedRequest,
-            simpleAuth.requestUrl());
+        EasyCodefResponse response = executeSimpleAuthRequest(
+            enrichedRequest,
+            simpleAuth.requestUrl()
+        );
 
         simpleAuthStorage.updateIfRequired(
             simpleAuth.requestUrl(),
@@ -115,7 +130,19 @@ public class EasyCodef {
             transactionId
         );
 
-        log.info("Result Status Code : {}", response.code());
+        String resultStatusCode = response.code();
+        log.info("Result Status Code : {}", resultStatusCode);
+        if (resultStatusCode.equals(CF_03002)) {
+            log.warn("Transaction Id : {}", transactionId);
+            log.warn(
+                "The end user has not completed the additional authentication. Recheck the end user's simple authentication status."
+            );
+        } else if (resultStatusCode.equals(CF_12872)) {
+            log.warn("Transaction Id : {}", transactionId);
+            log.warn(
+                " Retry limit for additional authentication exceeded. Please restart the process from the initial request."
+            );
+        }
 
         return response;
     }
