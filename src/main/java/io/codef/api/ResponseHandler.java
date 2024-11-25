@@ -13,45 +13,39 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import java.util.function.Function;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 
 public class ResponseHandler {
-
     private static final String UTF_8 = StandardCharsets.UTF_8.toString();
-
-    public ResponseHandler() {
-    }
 
     /**
      * 토큰 응답 처리
      */
     public String handleTokenResponse(ClassicHttpResponse response) throws CodefException {
-        HttpStatusHandler<String> handler = new HttpStatusHandler<>(
-            response.getCode(),
+        return handleHttpResponse(
+            response,
+            this::parseAccessToken,
             CodefError.OAUTH_UNAUTHORIZED,
             CodefError.OAUTH_INTERNAL_ERROR,
-            this::parseAccessToken
+            false
         );
-
-        return handleHttpResponse(response, handler, false);
     }
 
     /**
      * 상품 응답 처리
      */
-    public EasyCodefResponse handleProductResponse(ClassicHttpResponse response)
-        throws CodefException {
-        HttpStatusHandler<EasyCodefResponse> handler = new HttpStatusHandler<>(
-            response.getCode(),
+    public EasyCodefResponse handleProductResponse(ClassicHttpResponse response) throws CodefException {
+        return handleHttpResponse(
+            response,
+            this::parseProductResponse,
             CodefError.CODEF_API_UNAUTHORIZED,
             CodefError.CODEF_API_SERVER_ERROR,
-            this::parseProductResponse
+            true
         );
-
-        return handleHttpResponse(response, handler, true);
     }
 
     /**
@@ -59,27 +53,31 @@ public class ResponseHandler {
      */
     private <T> T handleHttpResponse(
         ClassicHttpResponse response,
-        HttpStatusHandler<T> handler,
+        Function<String, T> parser,
+        CodefError unauthorizedError,
+        CodefError defaultError,
         boolean requireUrlDecoding
     ) throws CodefException {
         String responseBody = extractResponseBody(response, requireUrlDecoding);
-        return handleStatusCode(responseBody, handler);
+
+        return switch (response.getCode()) {
+            case HttpStatus.SC_OK -> parser.apply(responseBody);
+            case HttpStatus.SC_UNAUTHORIZED -> throw CodefException.of(unauthorizedError, responseBody);
+            default -> throw CodefException.of(defaultError, responseBody);
+        };
     }
 
     /**
      * HTTP 응답 본문 추출
      */
-    private String extractResponseBody(
-        ClassicHttpResponse response,
-        boolean requiresDecoding
-    ) {
+    private String extractResponseBody(ClassicHttpResponse response, boolean requiresDecoding) throws CodefException {
         try {
             String responseBody = EntityUtils.toString(response.getEntity());
             return requiresDecoding ? URLDecoder.decode(responseBody, UTF_8) : responseBody;
-        } catch (IOException ioException) {
-            throw CodefException.of(CodefError.IO_ERROR, ioException);
-        } catch (ParseException parseException) {
-            throw CodefException.of(CodefError.PARSE_ERROR, parseException);
+        } catch (IOException e) {
+            throw CodefException.of(CodefError.IO_ERROR, e);
+        } catch (ParseException e) {
+            throw CodefException.of(CodefError.PARSE_ERROR, e);
         }
     }
 
@@ -89,8 +87,8 @@ public class ResponseHandler {
     private String parseAccessToken(String responseBody) throws CodefException {
         try {
             return JSON.parseObject(responseBody).getString(ACCESS_TOKEN);
-        } catch (Exception exception) {
-            throw CodefException.of(CodefError.PARSE_ERROR, exception);
+        } catch (Exception e) {
+            throw CodefException.of(CodefError.PARSE_ERROR, e);
         }
     }
 
@@ -98,50 +96,20 @@ public class ResponseHandler {
      * 상품 응답 파싱
      */
     private EasyCodefResponse parseProductResponse(String responseBody) throws CodefException {
-        JSONObject jsonResponse = JSON.parseObject(responseBody);
+        try {
+            JSONObject jsonResponse = JSON.parseObject(responseBody);
 
-        EasyCodefResponse.Result result = Optional.ofNullable(jsonResponse.getJSONObject(RESULT))
-            .map(object -> object.to(EasyCodefResponse.Result.class))
-            .orElseThrow(() -> CodefException.from(CodefError.PARSE_ERROR));
+            EasyCodefResponse.Result result = Optional.ofNullable(jsonResponse.getJSONObject(RESULT))
+                .map(object -> object.to(EasyCodefResponse.Result.class))
+                .orElseThrow(() -> CodefException.from(CodefError.PARSE_ERROR));
 
-        Object data = Optional.ofNullable(jsonResponse.getJSONObject(DATA))
-            .map(obj -> obj.to(Object.class))
-            .orElseThrow(() -> CodefException.from(CodefError.PARSE_ERROR));
+            Object data = Optional.ofNullable(jsonResponse.getJSONObject(DATA))
+                .map(obj -> obj.to(Object.class))
+                .orElseThrow(() -> CodefException.from(CodefError.PARSE_ERROR));
 
-        return new EasyCodefResponse(result, data);
-    }
-
-    /**
-     * HTTP 상태 코드에 따른 처리
-     */
-    private <T> T handleStatusCode(String responseBody, HttpStatusHandler<T> handler)
-        throws CodefException {
-        return switch (handler.statusCode) {
-            case HttpStatus.SC_OK -> handler.successHandler.parse(responseBody);
-            case HttpStatus.SC_UNAUTHORIZED ->
-                throw CodefException.of(handler.unauthorizedError, responseBody);
-            default -> throw CodefException.of(handler.defaultError, responseBody);
-        };
-    }
-
-    /**
-     * HTTP 응답 처리를 위한 공통 인터페이스
-     */
-    private interface ResponseParser<T> {
-
-        T parse(String responseBody) throws CodefException;
-
-    }
-
-    /**
-     * HTTP 응답 상태 코드에 따른 처리를 위한 레코드
-     */
-    private record HttpStatusHandler<T>(
-        int statusCode,
-        CodefError unauthorizedError,
-        CodefError defaultError,
-        ResponseParser<T> successHandler
-    ) {
-
+            return new EasyCodefResponse(result, data);
+        } catch (Exception e) {
+            throw CodefException.of(CodefError.PARSE_ERROR, e);
+        }
     }
 }
