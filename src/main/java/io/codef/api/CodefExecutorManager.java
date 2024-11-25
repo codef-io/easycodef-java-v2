@@ -2,6 +2,7 @@ package io.codef.api;
 
 import io.codef.api.dto.EasyCodefRequest;
 import io.codef.api.dto.EasyCodefResponse;
+import io.codef.api.facade.SingleReqFacade;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -28,12 +29,12 @@ public class CodefExecutorManager {
     public CompletableFuture<EasyCodefResponse> scheduleRequest(
         EasyCodefRequest request,
         long delayMs,
-        SingleProductRequestor requestor
+        SingleReqFacade facade
     ) {
         CompletableFuture<EasyCodefResponse> future = new CompletableFuture<>();
 
         scheduler.schedule(
-            () -> executeRequest(request, requestor, future),
+            () -> executeRequest(request, facade, future),
             delayMs,
             TimeUnit.MILLISECONDS
         );
@@ -43,12 +44,12 @@ public class CodefExecutorManager {
 
     private void executeRequest(
         EasyCodefRequest request,
-        SingleProductRequestor requestor,
+        SingleReqFacade facade,
         CompletableFuture<EasyCodefResponse> future
     ) {
         CompletableFuture.supplyAsync(() -> {
             try {
-                return requestor.requestProduct(request);
+                return facade.requestProduct(request);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

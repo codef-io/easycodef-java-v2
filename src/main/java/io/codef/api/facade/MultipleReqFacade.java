@@ -1,7 +1,9 @@
-package io.codef.api;
+package io.codef.api.facade;
 
 import static io.codef.api.dto.EasyCodefRequest.SSO_ID;
 
+import io.codef.api.CodefExecutorManager;
+import io.codef.api.CodefValidator;
 import io.codef.api.dto.EasyCodefRequest;
 import io.codef.api.dto.EasyCodefResponse;
 import io.codef.api.error.CodefError;
@@ -13,19 +15,19 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.IntStream;
 
 // 다중 요청 처리기
-public class MultipleProductRequestor {
+public class MultipleReqFacade {
     private static final long REQUEST_DELAY_MS = 700L;
 
-    private final SingleProductRequestor singleProductRequestor;
+    private final SingleReqFacade singleReqFacade;
     private final MultipleRequestStorage multipleRequestStorage;
     private final CodefExecutorManager executorManager;
 
-    public MultipleProductRequestor(
-        SingleProductRequestor singleProductRequestor,
+    public MultipleReqFacade(
+        SingleReqFacade singleReqFacade,
         MultipleRequestStorage multipleRequestStorage,
         CodefExecutorManager executorManager
     ) {
-        this.singleProductRequestor = singleProductRequestor;
+        this.singleReqFacade = singleReqFacade;
         this.multipleRequestStorage = multipleRequestStorage;
         this.executorManager = executorManager;
     }
@@ -68,7 +70,7 @@ public class MultipleProductRequestor {
             .mapToObj(i -> executorManager.scheduleRequest(
                 requests.get(i),
                 i * REQUEST_DELAY_MS,
-                singleProductRequestor
+                singleReqFacade
             ))
             .toList();
     }

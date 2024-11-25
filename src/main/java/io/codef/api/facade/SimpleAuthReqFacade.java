@@ -1,4 +1,4 @@
-package io.codef.api;
+package io.codef.api.facade;
 
 import static io.codef.api.constants.CodefResponseCode.CF_03002;
 import static io.codef.api.constants.CodefResponseCode.CF_12872;
@@ -17,19 +17,19 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SimpleAuthRequestor {
+public class SimpleAuthReqFacade {
 
-    private static final Logger log = LoggerFactory.getLogger(SimpleAuthRequestor.class);
-    private final SingleProductRequestor singleProductRequestor;
+    private static final Logger log = LoggerFactory.getLogger(SimpleAuthReqFacade.class);
+    private final SingleReqFacade singleReqFacade;
     private final SimpleAuthStorage simpleAuthStorage;
     private final MultipleRequestStorage multipleRequestStorage;
 
-    public SimpleAuthRequestor(
-        SingleProductRequestor singleProductRequestor,
+    public SimpleAuthReqFacade(
+        SingleReqFacade singleReqFacade,
         SimpleAuthStorage simpleAuthStorage,
         MultipleRequestStorage multipleRequestStorage
     ) {
-        this.singleProductRequestor = singleProductRequestor;
+        this.singleReqFacade = singleReqFacade;
         this.simpleAuthStorage = simpleAuthStorage;
         this.multipleRequestStorage = multipleRequestStorage;
     }
@@ -39,7 +39,7 @@ public class SimpleAuthRequestor {
         CodefSimpleAuth simpleAuth = simpleAuthStorage.get(transactionId);
         EasyCodefRequest enrichedRequest = enrichRequestWithTwoWayInfo(simpleAuth);
 
-        EasyCodefResponse response = singleProductRequestor.requestProduct(enrichedRequest);
+        EasyCodefResponse response = singleReqFacade.requestProduct(enrichedRequest);
 
         simpleAuthStorage.updateIfRequired(
             simpleAuth.requestUrl(),
@@ -77,7 +77,7 @@ public class SimpleAuthRequestor {
         EasyCodefRequest enrichedRequest = enrichRequestWithTwoWayInfo(simpleAuth);
 
         EasyCodefResponse firstResponse =
-            singleProductRequestor.requestProduct(enrichedRequest);
+            singleReqFacade.requestProduct(enrichedRequest);
 
         simpleAuthStorage.updateIfRequired(
             simpleAuth.requestUrl(),
