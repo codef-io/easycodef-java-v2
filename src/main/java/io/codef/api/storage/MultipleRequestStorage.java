@@ -4,11 +4,13 @@ import io.codef.api.CodefValidator;
 import io.codef.api.dto.EasyCodefResponse;
 import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class MultipleRequestStorage {
 
@@ -30,7 +32,7 @@ public class MultipleRequestStorage {
                 .map(this::safeJoin)
                 .filter(Objects::nonNull)
                 .filter(response -> !Objects.equals(response.transactionId(), transactionId))
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
 
             storage.remove(transactionId);
             return results;

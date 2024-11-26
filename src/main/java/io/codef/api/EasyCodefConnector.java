@@ -1,7 +1,5 @@
 package io.codef.api;
 
-import static io.codef.api.dto.EasyCodefRequest.BASIC_TOKEN_FORMAT;
-import static io.codef.api.dto.EasyCodefRequest.BEARER_TOKEN_FORMAT;
 import static org.apache.hc.core5.http.HttpHeaders.AUTHORIZATION;
 
 import com.alibaba.fastjson2.JSON;
@@ -11,11 +9,13 @@ import io.codef.api.dto.EasyCodefRequest;
 import io.codef.api.dto.EasyCodefResponse;
 import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
-import io.codef.api.logger.JsonLogUtil;
+import io.codef.api.util.AuthorizationUtil;
 import io.codef.api.util.HttpClientUtil;
+import io.codef.api.util.JsonUtil;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.slf4j.Logger;
@@ -54,7 +54,8 @@ public class EasyCodefConnector {
 
     private static HttpPost createTokenRequest(String codefOAuthToken) {
         HttpPost httpPost = new HttpPost(CodefHost.CODEF_OAUTH_SERVER + CodefPath.ISSUE_TOKEN);
-        httpPost.addHeader(AUTHORIZATION, String.format(BASIC_TOKEN_FORMAT, codefOAuthToken));
+        String basicToken = AuthorizationUtil.createBasicAuth(codefOAuthToken);
+        httpPost.addHeader(AUTHORIZATION, basicToken);
         return httpPost;
     }
 
@@ -64,8 +65,8 @@ public class EasyCodefConnector {
         String requestUrl
     ) {
         HttpPost httpPost = new HttpPost(requestUrl);
-        httpPost.addHeader(AUTHORIZATION,
-            String.format(BEARER_TOKEN_FORMAT, token.getAccessToken()));
+        String accessToken = AuthorizationUtil.createBearerAuth(token.getAccessToken());
+        httpPost.addHeader(AUTHORIZATION, accessToken);
 
         String rawRequest = JSON.toJSONString(request.requestBody());
         httpPost.setEntity(new StringEntity(rawRequest, StandardCharsets.UTF_8));
@@ -76,24 +77,37 @@ public class EasyCodefConnector {
     private static <T> T executeRequest(
         HttpPost request,
         ResponseProcessor<T> processor
-    ) {
-        try (var httpClient = HttpClientUtil.createClient()) {
-            log.info("[{}] Codef API Request", request.hashCode());
-            log.info("> Request Host : {}://{}", request.getScheme(),
-                request.getAuthority().toString());
-            log.info("> Requset Uri : {}\n", request.getRequestUri());
+    ) throws CodefException {
+        logRequest(request);
 
+        try (CloseableHttpClient httpClient = HttpClientUtil.createClient()) {
             return httpClient.execute(request, response -> {
-                log.info("[{}] Codef API Response", request.hashCode());
-                log.info("> Response Status : {}", response.getCode());
                 T result = processor.process(response);
-                log.info("> Response →\n{}\n", JsonLogUtil.toPrettyJson(result));
-
+                logResponse(request.hashCode(), response, result);
                 return result;
             });
         } catch (IOException exception) {
             throw CodefException.of(CodefError.IO_ERROR, exception);
         }
+    }
+
+    private static void logRequest(HttpPost request) {
+        log.info("[{}] Codef API Request", request.hashCode());
+        log.info("> Request Host: {}://{}",
+            request.getScheme(),
+            request.getAuthority()
+        );
+        log.info("> Request URI: {}\n", request.getRequestUri());
+    }
+
+    private static void logResponse(
+        int requestHashCode,
+        ClassicHttpResponse response,
+        Object result
+    ) {
+        log.info("[{}] Codef API Response", requestHashCode);
+        log.info("> Response Status: {}", response.getCode());
+        log.info("> Response → \n{}", JsonUtil.toPrettyJson(result));
     }
 
     @FunctionalInterface
