@@ -74,8 +74,17 @@ public class EasyCodef {
     }
 
     private void logInitializeSuccessfully() {
-        log.info("===================================");
-        log.info("EasyCodef successfully initialized!");
-        log.info("===================================\n");
+        log.info("""
+            
+            
+            ------.                        ,-----.          ,--.       ,---.\s
+            |  .---' ,--,--. ,---.,--. ,--.'  .--./ ,---.  ,-|  |,---. /  .-'\s
+            |  `--, ' ,-.  |(  .-' \\  '  / |  |    | .-. |' .-. | .-. :|  `-,\s
+            |  `---.\\ '-'  |.-'  `) \\   '  '  '--'\\' '-' '\\ `-' \\   --.|  .-'\s
+            `------' `--`--'`----'.-'  /    `-----' `---'  `---' `----'`--'     \s
+            
+            > EasyCodef v2.0.0-beta-004 Successfully Initialized! Hello worlds!
+            """
+        );
     }
 }

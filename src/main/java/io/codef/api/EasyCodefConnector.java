@@ -107,7 +107,7 @@ public class EasyCodefConnector {
     ) {
         log.info("[{}] Codef API Response", requestHashCode);
         log.info("> Response Status: {}", response.getCode());
-        log.info("> Response → \n{}", JsonUtil.toPrettyJson(result));
+        log.info("> Response → \n{}\n", JsonUtil.toPrettyJson(result));
     }
 
     @FunctionalInterface

@@ -38,8 +38,7 @@ public class MultipleReqFacade {
         assignSsoId(requests, UUID.randomUUID().toString());
 
         try {
-            List<CompletableFuture<EasyCodefResponse>> futures =
-                scheduleRequests(requests);
+            List<CompletableFuture<EasyCodefResponse>> futures = scheduleRequests(requests);
 
             CompletableFuture<EasyCodefResponse> firstCompleted =
                 CompletableFuture.anyOf(futures.toArray(new CompletableFuture[0]))
@@ -50,7 +49,7 @@ public class MultipleReqFacade {
 
             return result;
         } finally {
-            executorManager.shutdown();
+            executorManager.close();
         }
     }
 
