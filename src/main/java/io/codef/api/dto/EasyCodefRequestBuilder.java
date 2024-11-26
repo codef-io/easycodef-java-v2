@@ -84,13 +84,7 @@ public class EasyCodefRequestBuilder {
         this.requestBody(EASY_CODEF_JAVA_FLAG, true);
         this.generalRequestBody.putAll(secureRequestBody);
 
-        EasyCodefRequest easyCodefRequest = new EasyCodefRequest(path, generalRequestBody);
-
-//        log.info("[EasyCodef] request object has been successfully built [ {} ]");
-//        log.info(">> path = {}", path);
-//        log.info(">> requestBody = {}", generalRequestBody);
-
-        return easyCodefRequest;
+        return new EasyCodefRequest(path, generalRequestBody);
     }
 
     private void encryptSecureRequestBody() {

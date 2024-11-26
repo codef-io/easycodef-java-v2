@@ -25,21 +25,14 @@
 <p align="center">
   <a href="https://github.com/codef-io/easycodef-java-v2/actions?query=branch%3Amaster"><img align="center" src="https://img.shields.io/github/actions/workflow/status/codef-io/easycodef-java-v2/publish.yml?style=for-the-badge&logo=gradle&color=02303A" alt="Build Status"/></a>
   <a href="https://github.com/codef-io/easycodef-java-v2"><img align="center"  src="https://img.shields.io/github/last-commit/codef-io/easycodef-java-v2/master?style=for-the-badge&label=LAST%20BUILD&logo=Github&color=181717" alt="Last Commit"/></a>
-  <a href="https://central.sonatype.com/artifact/io.codef.api/easycodef-java-v2/2.0.0-beta-003"><img align="center"  src="https://img.shields.io/maven-central/v/io.codef.api/easycodef-java-v2.svg?style=for-the-badge&label=Maven%20Central&logo=apache-maven&color=C71A36" alt="Maven Central"/></a>
+  <a href="https://central.sonatype.com/artifact/io.codef.api/easycodef-java-v2/2.0.0-beta-004"><img align="center"  src="https://img.shields.io/maven-central/v/io.codef.api/easycodef-java-v2.svg?style=for-the-badge&label=Maven%20Central&logo=apache-maven&color=C71A36" alt="Maven Central"/></a>
 </p>
 
 <br><br>
 
-> [!TIP]
-> - **[EasyCodef V2 Wiki](https://github.com/codef-io/easycodef-java-v2/wiki)**
-
-<br>
-
-> [!NOTE]
-> - [Codef Homepage](https://codef.io/)
+> [!IMPORTANT]
+> - **[EasyCodef Java V2 Wiki Guide Docs](https://github.com/codef-io/easycodef-java-v2/wiki)**
 > - [Codef API Developer Guide](https://developer.codef.io/)
-> - [Hectodata Homepage](https://hectodata.co.kr/)
-> - [Hecto Tech Blog](https://blog.hectodata.co.kr/)
 
 <br>
 

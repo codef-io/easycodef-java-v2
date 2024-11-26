@@ -1,11 +1,11 @@
 package io.codef.api.storage;
 
 import io.codef.api.constants.CodefResponseCode;
-import io.codef.api.dto.CodefSimpleAuth;
 import io.codef.api.dto.EasyCodefRequest;
 import io.codef.api.dto.EasyCodefResponse;
 import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
+import io.codef.api.vo.CodefSimpleAuth;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
