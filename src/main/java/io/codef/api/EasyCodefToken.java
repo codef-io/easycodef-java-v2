@@ -32,7 +32,7 @@ public class EasyCodefToken {
         this.expiresAt = LocalDateTime.now().plusDays(VALIDITY_PERIOD_DAYS);
 
         log.info(
-            "Codef API AccessToken expiry at {} but, EasyCodef will handle automatic renewal",
+            "Codef API AccessToken expiry at {}. Also, EasyCodef will handle automatic renewal.",
             expiresAt
         );
         log.info("Codef API AccessToken successfully initialized.\n");

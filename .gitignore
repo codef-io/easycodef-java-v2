@@ -1,3 +1,4 @@
+/src/main/resources/logback-test.xml
 *.java.hsp
 *.sonarj
 *.sw*

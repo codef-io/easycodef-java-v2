@@ -1,20 +1,11 @@
 package io.codef.api.dto;
 
-import static org.apache.hc.client5.http.auth.StandardAuthScheme.BASIC;
-import static org.apache.hc.client5.http.auth.StandardAuthScheme.BEARER;
-
 import java.util.HashMap;
 
 public record EasyCodefRequest(
     String path,
     HashMap<String, Object> requestBody
 ) {
-
-    /**
-     * Header Format Constants
-     */
-    public static final String BEARER_TOKEN_FORMAT = BEARER + " %s";
-    public static final String BASIC_TOKEN_FORMAT = BASIC + " %s";
 
     /**
      * Header Format Constants
