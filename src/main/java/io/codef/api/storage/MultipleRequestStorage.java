@@ -5,16 +5,15 @@ import io.codef.api.dto.EasyCodefResponse;
 import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class MultipleRequestStorage {
 
-    private final Map<String, List<CompletableFuture<EasyCodefResponse>>> storage = new HashMap<>();
+    private final ConcurrentHashMap<String, List<CompletableFuture<EasyCodefResponse>>> storage = new ConcurrentHashMap<>();
 
     public List<EasyCodefResponse> getRemainingResponses(
         String transactionId

@@ -12,6 +12,7 @@ import io.codef.api.error.CodefException;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import org.apache.hc.core5.http.ClassicHttpResponse;
@@ -20,6 +21,7 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 
 public class ResponseHandler {
+
     private static final String UTF_8 = StandardCharsets.UTF_8.toString();
 
     /**
@@ -38,7 +40,8 @@ public class ResponseHandler {
     /**
      * 상품 응답 처리
      */
-    public EasyCodefResponse handleProductResponse(ClassicHttpResponse response) throws CodefException {
+    public EasyCodefResponse handleProductResponse(ClassicHttpResponse response)
+        throws CodefException {
         return handleHttpResponse(
             response,
             this::parseProductResponse,
@@ -62,7 +65,8 @@ public class ResponseHandler {
 
         return switch (response.getCode()) {
             case HttpStatus.SC_OK -> parser.apply(responseBody);
-            case HttpStatus.SC_UNAUTHORIZED -> throw CodefException.of(unauthorizedError, responseBody);
+            case HttpStatus.SC_UNAUTHORIZED ->
+                throw CodefException.of(unauthorizedError, responseBody);
             default -> throw CodefException.of(defaultError, responseBody);
         };
     }
@@ -70,7 +74,8 @@ public class ResponseHandler {
     /**
      * HTTP 응답 본문 추출
      */
-    private String extractResponseBody(ClassicHttpResponse response, boolean requiresDecoding) throws CodefException {
+    private String extractResponseBody(ClassicHttpResponse response, boolean requiresDecoding)
+        throws CodefException {
         try {
             String responseBody = EntityUtils.toString(response.getEntity());
             return requiresDecoding ? URLDecoder.decode(responseBody, UTF_8) : responseBody;
@@ -99,17 +104,38 @@ public class ResponseHandler {
         try {
             JSONObject jsonResponse = JSON.parseObject(responseBody);
 
-            EasyCodefResponse.Result result = Optional.ofNullable(jsonResponse.getJSONObject(RESULT))
-                .map(object -> object.to(EasyCodefResponse.Result.class))
-                .orElseThrow(() -> CodefException.from(CodefError.PARSE_ERROR));
-
-            Object data = Optional.ofNullable(jsonResponse.getJSONObject(DATA))
-                .map(obj -> obj.to(Object.class))
-                .orElseThrow(() -> CodefException.from(CodefError.PARSE_ERROR));
+            EasyCodefResponse.Result result = parseResult(jsonResponse);
+            Object data = parseData(jsonResponse);
 
             return new EasyCodefResponse(result, data);
-        } catch (Exception e) {
-            throw CodefException.of(CodefError.PARSE_ERROR, e);
+        } catch (Exception exception) {
+            throw CodefException.of(CodefError.PARSE_ERROR, exception);
         }
+    }
+
+    private EasyCodefResponse.Result parseResult(JSONObject jsonResponse) throws CodefException {
+        return Optional.ofNullable(jsonResponse.getJSONObject(RESULT))
+            .map(object -> object.to(EasyCodefResponse.Result.class))
+            .orElseThrow(() -> CodefException.from(CodefError.PARSE_ERROR));
+    }
+
+    private Object parseData(JSONObject jsonResponse) throws CodefException {
+        try {
+            return parseObjectData(jsonResponse);
+        } catch (Exception e) {
+            return parseArrayData(jsonResponse);
+        }
+    }
+
+    private Object parseObjectData(JSONObject jsonResponse) throws CodefException {
+        return Optional.ofNullable(jsonResponse.getJSONObject(DATA))
+            .map(obj -> obj.to(Object.class))
+            .orElseThrow(() -> CodefException.from(CodefError.PARSE_ERROR));
+    }
+
+    private List<?> parseArrayData(JSONObject jsonResponse) throws CodefException {
+        return Optional.ofNullable(jsonResponse.getJSONArray(DATA))
+            .map(obj -> obj.to(List.class))
+            .orElseThrow(() -> CodefException.from(CodefError.PARSE_ERROR));
     }
 }

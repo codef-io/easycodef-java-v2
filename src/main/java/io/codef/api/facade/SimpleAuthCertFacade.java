@@ -140,7 +140,7 @@ public class SimpleAuthCertFacade {
 
         log.info("Success Response Status [CF-00000] Count : {}", successCount);
         log.info("AddAuth Response Status [CF-03002] Count : {}", addAuthCount);
-        log.warn("Failure Response Status [  Else  ] Count : {}", failureCount);
+        log.warn("Failure Response Status [  Else  ] Count : {}\n", failureCount);
 
         if (failureCount > 0) {
             responses.stream()
