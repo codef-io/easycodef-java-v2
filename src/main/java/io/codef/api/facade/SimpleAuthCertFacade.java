@@ -64,7 +64,6 @@ public class SimpleAuthCertFacade {
 
     private void logAddAuthResponseStatus(
         EasyCodefResponse response,
-        String transactionId,
         String resultStatusCode
     ) {
         if (resultStatusCode.equals(CF_03002)) {
@@ -92,7 +91,7 @@ public class SimpleAuthCertFacade {
         String resultStatusCode = response.code();
         logDefaultResponseStatus(transactionId, resultStatusCode);
 
-        logAddAuthResponseStatus(response, transactionId, resultStatusCode);
+        logAddAuthResponseStatus(response, resultStatusCode);
     }
 
     private List<EasyCodefResponse> returnFirstResponse(EasyCodefResponse firstErrorResponse) {
@@ -131,7 +130,6 @@ public class SimpleAuthCertFacade {
         log.info("Await Responses Count = {}", responses.size());
 
         responses.add(firstResponse);
-        List<String> allResponseCodes = responses.stream().map(EasyCodefResponse::code).toList();
         log.info("Total Responses Count = {}\n", responses.size());
 
         long successCount = responses.stream().filter(this::isSuccessResponse).count();
