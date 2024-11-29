@@ -6,6 +6,7 @@ import io.codef.api.dto.EasyCodefResponse;
 import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
 import io.codef.api.vo.CodefSimpleAuth;
+
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,7 +14,7 @@ public class SimpleAuthStorage {
 
     private final ConcurrentHashMap<String, CodefSimpleAuth> storage = new ConcurrentHashMap<>();
 
-    public void storeIfRequired(
+    public void storeIfAddAuthResponse(
         EasyCodefRequest request,
         EasyCodefResponse response,
         String requestUrl
@@ -34,9 +35,10 @@ public class SimpleAuthStorage {
     public void updateIfRequired(
         String path,
         EasyCodefRequest request,
-        EasyCodefResponse response,
-        String transactionId
+        EasyCodefResponse response
     ) {
+        String transactionId = response.transactionId();
+
         Optional.ofNullable(response.code())
             .filter(code -> code.equals(CodefResponseCode.CF_03002))
             .ifPresentOrElse(
