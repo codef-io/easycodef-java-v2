@@ -9,10 +9,11 @@ import io.codef.api.facade.SingleReqFacade;
 import io.codef.api.storage.MultipleRequestStorage;
 import io.codef.api.storage.SimpleAuthStorage;
 import io.codef.api.util.RsaUtil;
-import java.security.PublicKey;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.security.PublicKey;
+import java.util.List;
 
 public class EasyCodef {
 
@@ -83,7 +84,7 @@ public class EasyCodef {
             |  `---.\\ '-'  |.-'  `) \\   '  '  '--'\\' '-' '\\ `-' \\   --.|  .-'\s
             `------' `--`--'`----'.-'  /    `-----' `---'  `---' `----'`--'     \s
             
-            > EasyCodef v2.0.0-beta-004 Successfully Initialized! Hello worlds!
+            > EasyCodef v2.0.0-beta-005 Successfully Initialized! Hello worlds!
             """
         );
     }

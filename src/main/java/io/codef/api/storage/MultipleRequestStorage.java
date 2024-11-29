@@ -4,21 +4,26 @@ import io.codef.api.CodefValidator;
 import io.codef.api.dto.EasyCodefResponse;
 import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class MultipleRequestStorage {
 
-    private final Map<String, List<CompletableFuture<EasyCodefResponse>>> storage = new HashMap<>();
+    private static final Logger log = LoggerFactory.getLogger(MultipleRequestStorage.class);
+    private final ConcurrentHashMap<String, List<CompletableFuture<EasyCodefResponse>>> storage = new ConcurrentHashMap<>();
 
     public List<EasyCodefResponse> getRemainingResponses(
         String transactionId
     ) throws CodefException {
+        log.info("Await Responses called By transactionId `{}`", transactionId);
+
         final List<CompletableFuture<EasyCodefResponse>> futures = storage.get(transactionId);
         CodefValidator.requireNonNullElseThrow(futures, CodefError.SIMPLE_AUTH_FAILED);
 
@@ -35,6 +40,8 @@ public class MultipleRequestStorage {
                 .collect(Collectors.toCollection(ArrayList::new));
 
             storage.remove(transactionId);
+
+            log.info("Await Responses Count = {}", results.size());
             return results;
         } catch (Exception e) {
             throw CodefException.from(CodefError.SIMPLE_AUTH_FAILED);
