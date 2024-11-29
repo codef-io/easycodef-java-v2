@@ -54,6 +54,10 @@ public class EasyCodef {
         logInitializeSuccessfully();
     }
 
+    public String encryptRSA(String requestParam) throws CodefException {
+        return RsaUtil.encryptRSA(requestParam, publicKey);
+    }
+
     public EasyCodefResponse requestProduct(EasyCodefRequest request) throws CodefException {
         return singleReqFacade.requestProduct(request);
     }

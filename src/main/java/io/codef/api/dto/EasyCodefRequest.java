@@ -1,10 +1,10 @@
 package io.codef.api.dto;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public record EasyCodefRequest(
     String path,
-    HashMap<String, Object> requestBody
+    Map<String, Object> requestBody
 ) {
 
     /**
