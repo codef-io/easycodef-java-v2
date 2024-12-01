@@ -39,7 +39,6 @@ public class SimpleAuthCertFacade {
 
         simpleAuthStorage.updateIfRequired(simpleAuth.requestUrl(), enrichedRequest, response);
 
-        ResponseLogger.logResponseStatus(response);
         return response;
     }
 

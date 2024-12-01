@@ -22,16 +22,16 @@ public class MultipleRequestStorage {
     public List<EasyCodefResponse> getRemainingResponses(
         String transactionId
     ) throws CodefException {
-        log.info("Await Responses called By transactionId `{}`", transactionId);
-
         final List<CompletableFuture<EasyCodefResponse>> futures = storage.get(transactionId);
         CodefValidator.requireNonNullElseThrow(futures, CodefError.SIMPLE_AUTH_FAILED);
 
         try {
-            CompletableFuture<Void> allDone = CompletableFuture.allOf(
+            CompletableFuture<Void> awaitResponses = CompletableFuture.allOf(
                 futures.toArray(new CompletableFuture[0])
             );
-            allDone.join();
+
+            awaitResponses.join();
+            log.info("Await Responses called By transactionId `{}\n`", transactionId);
 
             List<EasyCodefResponse> results = futures.stream()
                 .map(this::safeJoin)
