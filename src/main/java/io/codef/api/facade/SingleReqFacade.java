@@ -1,8 +1,8 @@
 package io.codef.api.facade;
 
 import io.codef.api.EasyCodefConnector;
+import io.codef.api.EasyCodefLogger;
 import io.codef.api.EasyCodefToken;
-import io.codef.api.ResponseLogger;
 import io.codef.api.constants.CodefClientType;
 import io.codef.api.dto.EasyCodefRequest;
 import io.codef.api.dto.EasyCodefResponse;
@@ -33,7 +33,7 @@ public class SingleReqFacade {
             EasyCodefConnector.requestProduct(request, validToken, requestUrl);
 
         simpleAuthStorage.storeIfAddAuthResponse(request, response, requestUrl);
-        ResponseLogger.logResponseStatus(response);
+        EasyCodefLogger.logResponseStatus(response);
         return response;
     }
 

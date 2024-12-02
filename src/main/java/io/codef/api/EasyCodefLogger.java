@@ -10,10 +10,10 @@ import java.util.Optional;
 
 import static io.codef.api.constants.CodefResponseCode.*;
 
-public class ResponseLogger {
-    private static final Logger log = LoggerFactory.getLogger(ResponseLogger.class);
+public class EasyCodefLogger {
+    private static final Logger log = LoggerFactory.getLogger(EasyCodefLogger.class);
 
-    private ResponseLogger() {
+    private EasyCodefLogger() {
     }
 
 
@@ -80,15 +80,15 @@ public class ResponseLogger {
             long failureCount
     ) {
         Optional.of(successCount)
-                .filter(ResponseLogger::isExist)
+                .filter(EasyCodefLogger::isExist)
                 .ifPresent(count -> log.info("Success Response Status [ {} ] Count : {}", CF_00000, count));
 
         Optional.of(addAuthCount)
-                .filter(ResponseLogger::isExist)
+                .filter(EasyCodefLogger::isExist)
                 .ifPresent(count -> log.info("AddAuth Response Status [ {} ] Count : {}", CF_03002, count));
 
         Optional.of(failureCount)
-                .filter(ResponseLogger::isExist)
+                .filter(EasyCodefLogger::isExist)
                 .ifPresentOrElse(
                         count -> log.warn("Failure Response Status [   Else   ] Count : {}\n", count),
                         () -> log.info("No Failure Responses\n")
@@ -97,5 +97,20 @@ public class ResponseLogger {
 
     private static boolean isExist(Long count) {
         return count > 0;
+    }
+
+    static void logInitializeSuccessfully() {
+        log.info("""
+            
+            
+            ------.                        ,-----.          ,--.       ,---.\s
+            |  .---' ,--,--. ,---.,--. ,--.'  .--./ ,---.  ,-|  |,---. /  .-'\s
+            |  `--, ' ,-.  |(  .-' \\  '  / |  |    | .-. |' .-. | .-. :|  `-,\s
+            |  `---.\\ '-'  |.-'  `) \\   '  '  '--'\\' '-' '\\ `-' \\   --.|  .-'\s
+            `------' `--`--'`----'.-'  /    `-----' `---'  `---' `----'`--'     \s
+            
+            > EasyCodef v2.0.0-beta-005 Successfully Initialized! Hello worlds!
+            """
+        );
     }
 }
