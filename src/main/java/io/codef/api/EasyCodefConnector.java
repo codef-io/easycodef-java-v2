@@ -1,7 +1,5 @@
 package io.codef.api;
 
-import static org.apache.hc.core5.http.HttpHeaders.AUTHORIZATION;
-
 import com.alibaba.fastjson2.JSON;
 import io.codef.api.constants.CodefHost;
 import io.codef.api.constants.CodefPath;
@@ -11,20 +9,17 @@ import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
 import io.codef.api.util.AuthorizationUtil;
 import io.codef.api.util.HttpClientUtil;
-import io.codef.api.util.JsonUtil;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.io.entity.StringEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+import static org.apache.hc.core5.http.HttpHeaders.AUTHORIZATION;
 
 public class EasyCodefConnector {
-
-    private static final Logger log = LoggerFactory.getLogger(EasyCodefConnector.class);
-    private static final ResponseHandler responseHandler = new ResponseHandler();
 
     private EasyCodefConnector() {
     }
@@ -38,7 +33,7 @@ public class EasyCodefConnector {
         String requestUrl
     ) throws CodefException {
         HttpPost httpRequest = createProductRequest(request, token, requestUrl);
-        return executeRequest(httpRequest, responseHandler::handleProductResponse);
+        return executeRequest(httpRequest, ResponseHandler::handleProductResponse);
     }
 
     /**
@@ -48,7 +43,7 @@ public class EasyCodefConnector {
         String codefOAuthToken
     ) throws CodefException {
         HttpPost request = createTokenRequest(codefOAuthToken);
-        return executeRequest(request, responseHandler::handleTokenResponse);
+        return executeRequest(request, ResponseHandler::handleTokenResponse);
     }
 
 
@@ -78,36 +73,17 @@ public class EasyCodefConnector {
         HttpPost request,
         ResponseProcessor<T> processor
     ) throws CodefException {
-        logRequest(request);
+        EasyCodefLogger.logRequest(request);
 
         try (CloseableHttpClient httpClient = HttpClientUtil.createClient()) {
             return httpClient.execute(request, response -> {
                 T result = processor.process(response);
-                logResponse(request.hashCode(), response, result);
+                EasyCodefLogger.logResponse(request.hashCode(), response, result);
                 return result;
             });
         } catch (IOException exception) {
             throw CodefException.of(CodefError.IO_ERROR, exception);
         }
-    }
-
-    private static void logRequest(HttpPost request) {
-        log.info("[{}] Codef API Request", request.hashCode());
-        log.info("> Request Host: {}://{}",
-            request.getScheme(),
-            request.getAuthority()
-        );
-        log.info("> Request URI: {}\n", request.getRequestUri());
-    }
-
-    private static void logResponse(
-        int requestHashCode,
-        ClassicHttpResponse response,
-        Object result
-    ) {
-        log.info("[{}] Codef API Response", requestHashCode);
-        log.info("> Response Status: {}", response.getCode());
-        log.info("> Response → \n{}\n", JsonUtil.toPrettyJson(result));
     }
 
     @FunctionalInterface

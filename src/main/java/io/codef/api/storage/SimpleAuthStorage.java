@@ -5,7 +5,6 @@ import io.codef.api.dto.EasyCodefRequest;
 import io.codef.api.dto.EasyCodefResponse;
 import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
-import io.codef.api.vo.CodefSimpleAuth;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;

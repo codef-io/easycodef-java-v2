@@ -1,6 +1,7 @@
 package io.codef.api.storage;
 
 import io.codef.api.CodefValidator;
+import io.codef.api.EasyCodefLogger;
 import io.codef.api.dto.EasyCodefResponse;
 import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
@@ -22,16 +23,16 @@ public class MultipleRequestStorage {
     public List<EasyCodefResponse> getRemainingResponses(
         String transactionId
     ) throws CodefException {
-        log.info("Await Responses called By transactionId `{}`", transactionId);
-
         final List<CompletableFuture<EasyCodefResponse>> futures = storage.get(transactionId);
         CodefValidator.requireNonNullElseThrow(futures, CodefError.SIMPLE_AUTH_FAILED);
 
         try {
-            CompletableFuture<Void> allDone = CompletableFuture.allOf(
+            CompletableFuture<Void> awaitResponses = CompletableFuture.allOf(
                 futures.toArray(new CompletableFuture[0])
             );
-            allDone.join();
+
+            awaitResponses.join();
+            EasyCodefLogger.logAwaitResponse(transactionId);
 
             List<EasyCodefResponse> results = futures.stream()
                 .map(this::safeJoin)
@@ -41,7 +42,7 @@ public class MultipleRequestStorage {
 
             storage.remove(transactionId);
 
-            log.info("Await Responses Count = {}", results.size());
+            EasyCodefLogger.logAwaitResponseCounts(results);
             return results;
         } catch (Exception e) {
             throw CodefException.from(CodefError.SIMPLE_AUTH_FAILED);

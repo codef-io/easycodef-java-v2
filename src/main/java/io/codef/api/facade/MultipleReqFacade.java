@@ -1,7 +1,5 @@
 package io.codef.api.facade;
 
-import static io.codef.api.dto.EasyCodefRequest.SSO_ID;
-
 import io.codef.api.CodefExecutorManager;
 import io.codef.api.CodefValidator;
 import io.codef.api.dto.EasyCodefRequest;
@@ -9,11 +7,14 @@ import io.codef.api.dto.EasyCodefResponse;
 import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
 import io.codef.api.storage.MultipleRequestStorage;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
+
+import static io.codef.api.dto.EasyCodefRequest.SSO_ID;
 
 // 다중 요청 처리기
 public class MultipleReqFacade {
@@ -56,9 +57,9 @@ public class MultipleReqFacade {
         List<EasyCodefRequest> requests
     ) {
         return IntStream.range(0, requests.size())
-            .mapToObj(i -> {
-                applyDelay(i);
-                return executorManager.executeRequest(requests.get(i), singleReqFacade);
+            .mapToObj(index -> {
+                applyDelay(index);
+                return executorManager.executeRequest(requests.get(index), singleReqFacade);
             })
             .toList();
     }

@@ -1,4 +1,4 @@
-package io.codef.api.vo;
+package io.codef.api.storage;
 
 import io.codef.api.dto.EasyCodefRequest;
 import io.codef.api.dto.EasyCodefResponse;

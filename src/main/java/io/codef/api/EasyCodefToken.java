@@ -1,13 +1,13 @@
 package io.codef.api;
 
-import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class EasyCodefToken {
+import java.time.LocalDateTime;
+import java.util.Base64;
+import java.util.Optional;
 
+public class EasyCodefToken {
     private static final Logger log = LoggerFactory.getLogger(EasyCodefToken.class);
 
     private final String oauthToken;
@@ -15,55 +15,48 @@ public class EasyCodefToken {
     private LocalDateTime expiresAt;
 
     protected EasyCodefToken(EasyCodefBuilder builder) {
-
-        final int VALIDITY_PERIOD_DAYS = 7;
-        final String DELIMITER = ":";
-
-        String combinedKey = String.join(DELIMITER, builder.getClientId().toString(),
-            builder.getClientSecret().toString());
-
-        this.oauthToken = Base64.getEncoder().encodeToString(combinedKey.getBytes());
-        log.info("Codef OAuth Token : {}", oauthToken);
-        log.info("Codef OAuth Token successfully initialized.\n");
-
+        this.oauthToken = createOAuthToken(builder);
         this.accessToken = EasyCodefConnector.requestToken(oauthToken);
-        log.info("Codef API AccessToken : {}", accessToken);
+        this.expiresAt = calculateExpiryDateTime();
 
-        this.expiresAt = LocalDateTime.now().plusDays(VALIDITY_PERIOD_DAYS);
+        EasyCodefLogger.logAccessTokenCreation(accessToken, expiresAt);
+    }
 
-        log.info(
-            "Codef API AccessToken expiry at {}. Also, EasyCodef will handle automatic renewal.",
-            expiresAt
+    private String createOAuthToken(EasyCodefBuilder builder) {
+        final String DELIMITER = ":";
+        String combinedKey = String.join(
+                DELIMITER,
+                builder.getClientId().toString(),
+                builder.getClientSecret().toString()
         );
-        log.info("Codef API AccessToken successfully initialized.\n");
+
+        String oauthToken = Base64.getEncoder().encodeToString(combinedKey.getBytes());
+        EasyCodefLogger.logOAuthTokenCreation(oauthToken);
+        return oauthToken;
+    }
+
+    private LocalDateTime calculateExpiryDateTime() {
+        final int VALIDITY_PERIOD_DAYS = 7;
+        return LocalDateTime.now().plusDays(VALIDITY_PERIOD_DAYS);
     }
 
     public EasyCodefToken validateAndRefreshToken() {
         Optional.of(expiresAt).filter(this::isTokenExpiringSoon)
-            .ifPresent(expiry -> refreshToken());
-
+                .ifPresent(expiry -> refreshToken());
         return this;
     }
 
     private boolean isTokenExpiringSoon(LocalDateTime expiry) {
         return expiry.isBefore(LocalDateTime.now().plusHours(24));
-
     }
 
     private void refreshToken() {
-        log.info(
-            "Codef API AccessToken expiry at {} so EasyCodef refresh token",
-            expiresAt
-        );
+        EasyCodefLogger.logTokenRefreshStart(expiresAt);
+
         this.accessToken = EasyCodefConnector.requestToken(oauthToken);
-        log.info("Codef API AccessToken : {}", accessToken);
+        this.expiresAt = calculateExpiryDateTime();
 
-        this.expiresAt = LocalDateTime.now().plusDays(7);
-
-        log.info(
-            "AccessToken Refresh completed. Now, Codef accessToken expiry at {}.",
-            expiresAt
-        );
+        EasyCodefLogger.logTokenRefreshCompletion(accessToken, expiresAt);
     }
 
     public String getAccessToken() {

@@ -1,13 +1,13 @@
 package io.codef.api.facade;
 
+import io.codef.api.EasyCodefLogger;
 import io.codef.api.ResponseHandler;
-import io.codef.api.ResponseLogger;
 import io.codef.api.dto.EasyCodefRequest;
 import io.codef.api.dto.EasyCodefResponse;
 import io.codef.api.error.CodefException;
+import io.codef.api.storage.CodefSimpleAuth;
 import io.codef.api.storage.MultipleRequestStorage;
 import io.codef.api.storage.SimpleAuthStorage;
-import io.codef.api.vo.CodefSimpleAuth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,20 +31,21 @@ public class SimpleAuthCertFacade {
         this.multipleRequestStorage = multipleRequestStorage;
     }
 
-    public EasyCodefResponse requestSimpleAuthCertification(String transactionId)
-        throws CodefException {
+    public EasyCodefResponse requestSimpleAuthCertification(
+            String transactionId
+    ) throws CodefException {
         CodefSimpleAuth simpleAuth = simpleAuthStorage.get(transactionId);
         EasyCodefRequest enrichedRequest = enrichRequestWithTwoWayInfo(simpleAuth);
         EasyCodefResponse response = singleReqFacade.requestProduct(enrichedRequest);
 
         simpleAuthStorage.updateIfRequired(simpleAuth.requestUrl(), enrichedRequest, response);
 
-        ResponseLogger.logResponseStatus(response);
         return response;
     }
 
-    public List<EasyCodefResponse> requestMultipleSimpleAuthCertification(String transactionId)
-        throws CodefException {
+    public List<EasyCodefResponse> requestMultipleSimpleAuthCertification(
+            String transactionId
+    ) throws CodefException {
         EasyCodefResponse firstResponse = requestSimpleAuthCertification(transactionId);
 
         return ResponseHandler.isSuccessResponse(firstResponse)
@@ -73,7 +74,7 @@ public class SimpleAuthCertFacade {
     ) throws CodefException {
         List<EasyCodefResponse> responses = multipleRequestStorage.getRemainingResponses(transactionId);
         responses.add(firstResponse);
-        ResponseLogger.logStatusSummary(responses);
+        EasyCodefLogger.logStatusSummary(responses);
 
         return responses;
     }

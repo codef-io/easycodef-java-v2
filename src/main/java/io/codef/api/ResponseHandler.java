@@ -26,16 +26,15 @@ public class ResponseHandler {
 
     private static final String UTF_8 = StandardCharsets.UTF_8.toString();
 
+    private ResponseHandler() {
+    }
+
     public static boolean isSuccessResponse(EasyCodefResponse response) {
         return CodefResponseCode.CF_00000.equals(response.code());
     }
 
     public static boolean isAddAuthResponse(EasyCodefResponse response) {
         return CodefResponseCode.CF_03002.equals(response.code());
-    }
-
-    public static boolean isAddAuthExceedResponse(EasyCodefResponse response) {
-        return CodefResponseCode.CF_12872.equals(response.code());
     }
 
     public static boolean isFailureResponse(EasyCodefResponse response) {
@@ -45,10 +44,10 @@ public class ResponseHandler {
     /**
      * 토큰 응답 처리
      */
-    public String handleTokenResponse(ClassicHttpResponse response) throws CodefException {
+    public static String handleTokenResponse(ClassicHttpResponse response) throws CodefException {
         return handleHttpResponse(
                 response,
-                this::parseAccessToken,
+                ResponseHandler::parseAccessToken,
                 CodefError.OAUTH_UNAUTHORIZED,
                 CodefError.OAUTH_INTERNAL_ERROR,
                 false
@@ -58,11 +57,11 @@ public class ResponseHandler {
     /**
      * 상품 응답 처리
      */
-    public EasyCodefResponse handleProductResponse(ClassicHttpResponse response)
+    public static EasyCodefResponse handleProductResponse(ClassicHttpResponse response)
             throws CodefException {
         return handleHttpResponse(
                 response,
-                this::parseProductResponse,
+                ResponseHandler::parseProductResponse,
                 CodefError.CODEF_API_UNAUTHORIZED,
                 CodefError.CODEF_API_SERVER_ERROR,
                 true
@@ -70,9 +69,51 @@ public class ResponseHandler {
     }
 
     /**
+     * 상품 응답 파싱
+     */
+    private static EasyCodefResponse parseProductResponse(String responseBody) throws CodefException {
+        try {
+            JSONObject jsonResponse = JSON.parseObject(responseBody);
+
+            EasyCodefResponse.Result result = parseResult(jsonResponse);
+            Object data = parseData(jsonResponse);
+
+            return new EasyCodefResponse(result, data);
+        } catch (Exception exception) {
+            throw CodefException.of(CodefError.PARSE_ERROR, exception);
+        }
+    }
+
+    private static EasyCodefResponse.Result parseResult(JSONObject jsonResponse) throws CodefException {
+        return Optional.ofNullable(jsonResponse.getJSONObject(RESULT))
+                .map(object -> object.to(EasyCodefResponse.Result.class))
+                .orElseThrow(() -> CodefException.from(CodefError.PARSE_ERROR));
+    }
+
+    private static Object parseData(JSONObject jsonResponse) throws CodefException {
+        try {
+            return parseObjectData(jsonResponse);
+        } catch (Exception e) {
+            return parseArrayData(jsonResponse);
+        }
+    }
+
+    private static Object parseObjectData(JSONObject jsonResponse) throws CodefException {
+        return Optional.ofNullable(jsonResponse.getJSONObject(DATA))
+                .map(obj -> obj.to(Object.class))
+                .orElseThrow(() -> CodefException.from(CodefError.PARSE_ERROR));
+    }
+
+    private static List<?> parseArrayData(JSONObject jsonResponse) throws CodefException {
+        return Optional.ofNullable(jsonResponse.getJSONArray(DATA))
+                .map(obj -> obj.to(List.class))
+                .orElseThrow(() -> CodefException.from(CodefError.PARSE_ERROR));
+    }
+
+    /**
      * 공통 HTTP 응답 처리 로직
      */
-    private <T> T handleHttpResponse(
+    private static <T> T handleHttpResponse(
             ClassicHttpResponse response,
             Function<String, T> parser,
             CodefError unauthorizedError,
@@ -91,7 +132,7 @@ public class ResponseHandler {
     /**
      * HTTP 응답 본문 추출
      */
-    private String extractResponseBody(ClassicHttpResponse response, boolean requiresDecoding)
+    private static String extractResponseBody(ClassicHttpResponse response, boolean requiresDecoding)
             throws CodefException {
         try {
             String responseBody = EntityUtils.toString(response.getEntity());
@@ -106,53 +147,11 @@ public class ResponseHandler {
     /**
      * 액세스 토큰 파싱
      */
-    private String parseAccessToken(String responseBody) throws CodefException {
+    private static String parseAccessToken(String responseBody) throws CodefException {
         try {
             return JSON.parseObject(responseBody).getString(ACCESS_TOKEN);
         } catch (Exception e) {
             throw CodefException.of(CodefError.PARSE_ERROR, e);
         }
-    }
-
-    /**
-     * 상품 응답 파싱
-     */
-    private EasyCodefResponse parseProductResponse(String responseBody) throws CodefException {
-        try {
-            JSONObject jsonResponse = JSON.parseObject(responseBody);
-
-            EasyCodefResponse.Result result = parseResult(jsonResponse);
-            Object data = parseData(jsonResponse);
-
-            return new EasyCodefResponse(result, data);
-        } catch (Exception exception) {
-            throw CodefException.of(CodefError.PARSE_ERROR, exception);
-        }
-    }
-
-    private EasyCodefResponse.Result parseResult(JSONObject jsonResponse) throws CodefException {
-        return Optional.ofNullable(jsonResponse.getJSONObject(RESULT))
-                .map(object -> object.to(EasyCodefResponse.Result.class))
-                .orElseThrow(() -> CodefException.from(CodefError.PARSE_ERROR));
-    }
-
-    private Object parseData(JSONObject jsonResponse) throws CodefException {
-        try {
-            return parseObjectData(jsonResponse);
-        } catch (Exception e) {
-            return parseArrayData(jsonResponse);
-        }
-    }
-
-    private Object parseObjectData(JSONObject jsonResponse) throws CodefException {
-        return Optional.ofNullable(jsonResponse.getJSONObject(DATA))
-                .map(obj -> obj.to(Object.class))
-                .orElseThrow(() -> CodefException.from(CodefError.PARSE_ERROR));
-    }
-
-    private List<?> parseArrayData(JSONObject jsonResponse) throws CodefException {
-        return Optional.ofNullable(jsonResponse.getJSONArray(DATA))
-                .map(obj -> obj.to(List.class))
-                .orElseThrow(() -> CodefException.from(CodefError.PARSE_ERROR));
     }
 }

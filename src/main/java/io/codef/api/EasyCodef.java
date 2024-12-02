@@ -9,15 +9,11 @@ import io.codef.api.facade.SingleReqFacade;
 import io.codef.api.storage.MultipleRequestStorage;
 import io.codef.api.storage.SimpleAuthStorage;
 import io.codef.api.util.RsaUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.security.PublicKey;
 import java.util.List;
 
 public class EasyCodef {
-
-    private static final Logger log = LoggerFactory.getLogger(EasyCodef.class);
 
     private final SingleReqFacade singleReqFacade;
     private final MultipleReqFacade multipleReqFacade;
@@ -25,10 +21,10 @@ public class EasyCodef {
 
     private final PublicKey publicKey;
 
-    protected EasyCodef(EasyCodefBuilder builder) {
-        this.publicKey = RsaUtil.generatePublicKey(builder.getPublicKey());
+    protected EasyCodef(EasyCodefBuilder easyCodefBuilder) {
+        this.publicKey = RsaUtil.generatePublicKey(easyCodefBuilder.getPublicKey());
 
-        EasyCodefToken easyCodefToken = new EasyCodefToken(builder);
+        EasyCodefToken easyCodefToken = new EasyCodefToken(easyCodefBuilder);
         SimpleAuthStorage simpleAuthStorage = new SimpleAuthStorage();
         MultipleRequestStorage multipleRequestStorage = new MultipleRequestStorage();
         CodefExecutorManager executorManager = CodefExecutorManager.create();
@@ -36,7 +32,7 @@ public class EasyCodef {
         this.singleReqFacade = new SingleReqFacade(
             easyCodefToken,
             simpleAuthStorage,
-            builder.getClientType()
+            easyCodefBuilder.getClientType()
         );
 
         this.multipleReqFacade = new MultipleReqFacade(
@@ -51,45 +47,36 @@ public class EasyCodef {
             multipleRequestStorage
         );
 
-        logInitializeSuccessfully();
+        EasyCodefLogger.logInitializeSuccessfully();
     }
 
-    public String encryptRSA(String requestParam) throws CodefException {
+    public String encryptRSA(
+            String requestParam
+    ) throws CodefException {
         return RsaUtil.encryptRSA(requestParam, publicKey);
     }
 
-    public EasyCodefResponse requestProduct(EasyCodefRequest request) throws CodefException {
+    public EasyCodefResponse requestProduct(
+            EasyCodefRequest request
+    ) throws CodefException {
         return singleReqFacade.requestProduct(request);
     }
 
-    public EasyCodefResponse requestMultipleProduct(List<EasyCodefRequest> requests) throws CodefException {
+    public EasyCodefResponse requestMultipleProduct(
+            List<EasyCodefRequest> requests
+    ) throws CodefException {
         return multipleReqFacade.requestMultipleProduct(requests);
     }
 
-    public EasyCodefResponse requestSimpleAuthCertification(String transactionId) throws CodefException {
+    public EasyCodefResponse requestSimpleAuthCertification(
+            String transactionId
+    ) throws CodefException {
         return simpleAuthCertFacade.requestSimpleAuthCertification(transactionId);
     }
 
-    public List<EasyCodefResponse> requestMultipleSimpleAuthCertification(String transactionId) throws CodefException {
+    public List<EasyCodefResponse> requestMultipleSimpleAuthCertification(
+            String transactionId
+    ) throws CodefException {
         return simpleAuthCertFacade.requestMultipleSimpleAuthCertification(transactionId);
-    }
-
-    public PublicKey getPublicKey() {
-        return publicKey;
-    }
-
-    private void logInitializeSuccessfully() {
-        log.info("""
-            
-            
-            ------.                        ,-----.          ,--.       ,---.\s
-            |  .---' ,--,--. ,---.,--. ,--.'  .--./ ,---.  ,-|  |,---. /  .-'\s
-            |  `--, ' ,-.  |(  .-' \\  '  / |  |    | .-. |' .-. | .-. :|  `-,\s
-            |  `---.\\ '-'  |.-'  `) \\   '  '  '--'\\' '-' '\\ `-' \\   --.|  .-'\s
-            `------' `--`--'`----'.-'  /    `-----' `---'  `---' `----'`--'     \s
-            
-            > EasyCodef v2.0.0-beta-005 Successfully Initialized! Hello worlds!
-            """
-        );
     }
 }
