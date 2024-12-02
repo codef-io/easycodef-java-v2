@@ -2,9 +2,13 @@ package io.codef.api;
 
 import com.alibaba.fastjson2.JSON;
 import io.codef.api.dto.EasyCodefResponse;
+import io.codef.api.util.JsonUtil;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +20,24 @@ public class EasyCodefLogger {
     private EasyCodefLogger() {
     }
 
+    public static void logRequest(HttpPost request) {
+        log.info("[{}] Codef API Request", request.hashCode());
+        log.info("> Request Host: {}://{}",
+                request.getScheme(),
+                request.getAuthority()
+        );
+        log.info("> Request URI: {}\n", request.getRequestUri());
+    }
+
+    public static void logResponse(
+            int requestHashCode,
+            ClassicHttpResponse response,
+            Object result
+    ) {
+        log.info("[{}] Codef API Response", requestHashCode);
+        log.info("> Response Status: {}", response.getCode());
+        log.info("> Response → \n{}\n", JsonUtil.toPrettyJson(result));
+    }
 
     public static void logResponseStatus(EasyCodefResponse response) {
         logBasicInfo(response);
@@ -99,18 +121,65 @@ public class EasyCodefLogger {
         return count > 0;
     }
 
-    static void logInitializeSuccessfully() {
+    protected static void logInitializeSuccessfully() {
         log.info("""
-            
-            
-            ------.                        ,-----.          ,--.       ,---.\s
-            |  .---' ,--,--. ,---.,--. ,--.'  .--./ ,---.  ,-|  |,---. /  .-'\s
-            |  `--, ' ,-.  |(  .-' \\  '  / |  |    | .-. |' .-. | .-. :|  `-,\s
-            |  `---.\\ '-'  |.-'  `) \\   '  '  '--'\\' '-' '\\ `-' \\   --.|  .-'\s
-            `------' `--`--'`----'.-'  /    `-----' `---'  `---' `----'`--'     \s
-            
-            > EasyCodef v2.0.0-beta-005 Successfully Initialized! Hello worlds!
-            """
+                
+                
+                ------.                        ,-----.          ,--.       ,---.\s
+                |  .---' ,--,--. ,---.,--. ,--.'  .--./ ,---.  ,-|  |,---. /  .-'\s
+                |  `--, ' ,-.  |(  .-' \\  '  / |  |    | .-. |' .-. | .-. :|  `-,\s
+                |  `---.\\ '-'  |.-'  `) \\   '  '  '--'\\' '-' '\\ `-' \\   --.|  .-'\s
+                `------' `--`--'`----'.-'  /    `-----' `---'  `---' `----'`--'     \s
+                
+                > EasyCodef v2.0.0-beta-005 Successfully Initialized! Hello worlds!
+                """
         );
+    }
+
+    protected static void logOAuthTokenCreation(String oauthToken) {
+        log.info("Codef OAuth Token : {}", oauthToken);
+        log.info("Codef OAuth Token successfully initialized.\n");
+    }
+
+    protected static void logAccessTokenCreation(
+            String accessToken,
+            LocalDateTime expiresAt
+    ) {
+        logAccessToken(accessToken);
+        log.info(
+                "Codef API AccessToken expiry at {}. Also, EasyCodef will handle automatic renewal.",
+                expiresAt
+        );
+        log.info("Codef API AccessToken successfully initialized.\n");
+    }
+
+    protected static void logTokenRefreshStart(LocalDateTime expiresAt) {
+        log.info(
+                "Codef API AccessToken expiry at {} so EasyCodef refresh token",
+                expiresAt
+        );
+    }
+
+    public static void logAwaitResponseCounts(List<EasyCodefResponse> results) {
+        log.info("Await Responses Count = {}", results.size());
+    }
+
+    public static void logAwaitResponse(String transactionId) {
+        log.info("Await Responses called By transactionId: {}", transactionId);
+    }
+
+    protected static void logTokenRefreshCompletion(
+            String accessToken,
+            LocalDateTime expiresAt
+    ) {
+        logAccessToken(accessToken);
+        log.info(
+                "AccessToken Refresh completed. Now, Codef accessToken expiry at {}.",
+                expiresAt
+        );
+    }
+
+    private static void logAccessToken(String accessToken) {
+        log.info("Codef API AccessToken : {}", accessToken);
     }
 }

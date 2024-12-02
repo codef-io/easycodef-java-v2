@@ -10,6 +10,9 @@ import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
 import io.codef.api.storage.SimpleAuthStorage;
 
+import static io.codef.api.constants.CodefResponseCode.CF_00004;
+import static io.codef.api.constants.CodefResponseCode.CF_00005;
+
 // 단일 요청 처리기
 public class SingleReqFacade {
     private final EasyCodefToken easyCodefToken;
@@ -33,16 +36,19 @@ public class SingleReqFacade {
         EasyCodefToken validToken = easyCodefToken.validateAndRefreshToken();
 
         EasyCodefResponse response = EasyCodefConnector.requestProduct(request, validToken, requestUrl);
-
-        if (response.code().equals("CF-00004")) {
-            throw CodefException.from(CodefError.KEY_CONFLICT_DEMO);
-        } else if (response.code().equals("CF-00005")) {
-            throw CodefException.from(CodefError.KEY_CONFLICT_API);
-        }
+        validateClientKey(response);
 
         simpleAuthStorage.storeIfAddAuthResponse(request, response, requestUrl);
         EasyCodefLogger.logResponseStatus(response);
         return response;
+    }
+
+    private void validateClientKey(EasyCodefResponse response) {
+        if (response.code().equals(CF_00004)) {
+            throw CodefException.from(CodefError.KEY_CONFLICT_DEMO);
+        } else if (response.code().equals(CF_00005)) {
+            throw CodefException.from(CodefError.KEY_CONFLICT_API);
+        }
     }
 
     private String buildRequestUrl(EasyCodefRequest request) {

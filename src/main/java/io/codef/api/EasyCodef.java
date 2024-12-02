@@ -9,15 +9,11 @@ import io.codef.api.facade.SingleReqFacade;
 import io.codef.api.storage.MultipleRequestStorage;
 import io.codef.api.storage.SimpleAuthStorage;
 import io.codef.api.util.RsaUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.security.PublicKey;
 import java.util.List;
 
 public class EasyCodef {
-
-    private static final Logger log = LoggerFactory.getLogger(EasyCodef.class);
 
     private final SingleReqFacade singleReqFacade;
     private final MultipleReqFacade multipleReqFacade;
@@ -25,10 +21,10 @@ public class EasyCodef {
 
     private final PublicKey publicKey;
 
-    protected EasyCodef(EasyCodefBuilder builder) {
-        this.publicKey = RsaUtil.generatePublicKey(builder.getPublicKey());
+    protected EasyCodef(EasyCodefBuilder easyCodefBuilder) {
+        this.publicKey = RsaUtil.generatePublicKey(easyCodefBuilder.getPublicKey());
 
-        EasyCodefToken easyCodefToken = new EasyCodefToken(builder);
+        EasyCodefToken easyCodefToken = new EasyCodefToken(easyCodefBuilder);
         SimpleAuthStorage simpleAuthStorage = new SimpleAuthStorage();
         MultipleRequestStorage multipleRequestStorage = new MultipleRequestStorage();
         CodefExecutorManager executorManager = CodefExecutorManager.create();
@@ -36,7 +32,7 @@ public class EasyCodef {
         this.singleReqFacade = new SingleReqFacade(
             easyCodefToken,
             simpleAuthStorage,
-            builder.getClientType()
+            easyCodefBuilder.getClientType()
         );
 
         this.multipleReqFacade = new MultipleReqFacade(

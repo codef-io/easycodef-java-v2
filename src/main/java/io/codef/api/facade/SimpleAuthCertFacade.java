@@ -5,9 +5,9 @@ import io.codef.api.ResponseHandler;
 import io.codef.api.dto.EasyCodefRequest;
 import io.codef.api.dto.EasyCodefResponse;
 import io.codef.api.error.CodefException;
+import io.codef.api.storage.CodefSimpleAuth;
 import io.codef.api.storage.MultipleRequestStorage;
 import io.codef.api.storage.SimpleAuthStorage;
-import io.codef.api.vo.CodefSimpleAuth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
