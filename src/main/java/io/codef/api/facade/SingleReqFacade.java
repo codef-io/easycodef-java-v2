@@ -6,6 +6,7 @@ import io.codef.api.EasyCodefToken;
 import io.codef.api.constants.CodefClientType;
 import io.codef.api.dto.EasyCodefRequest;
 import io.codef.api.dto.EasyCodefResponse;
+import io.codef.api.error.CodefError;
 import io.codef.api.error.CodefException;
 import io.codef.api.storage.SimpleAuthStorage;
 
@@ -16,21 +17,28 @@ public class SingleReqFacade {
     private final CodefClientType clientType;
 
     public SingleReqFacade(
-        EasyCodefToken easyCodefToken,
-        SimpleAuthStorage simpleAuthStorage,
-        CodefClientType clientType
+            EasyCodefToken easyCodefToken,
+            SimpleAuthStorage simpleAuthStorage,
+            CodefClientType clientType
     ) {
         this.easyCodefToken = easyCodefToken;
         this.simpleAuthStorage = simpleAuthStorage;
         this.clientType = clientType;
     }
 
-    public EasyCodefResponse requestProduct(EasyCodefRequest request) throws CodefException {
+    public EasyCodefResponse requestProduct(
+            EasyCodefRequest request
+    ) throws CodefException {
         String requestUrl = buildRequestUrl(request);
         EasyCodefToken validToken = easyCodefToken.validateAndRefreshToken();
 
-        EasyCodefResponse response =
-            EasyCodefConnector.requestProduct(request, validToken, requestUrl);
+        EasyCodefResponse response = EasyCodefConnector.requestProduct(request, validToken, requestUrl);
+
+        if (response.code().equals("CF-00004")) {
+            throw CodefException.from(CodefError.KEY_CONFLICT_DEMO);
+        } else if (response.code().equals("CF-00005")) {
+            throw CodefException.from(CodefError.KEY_CONFLICT_API);
+        }
 
         simpleAuthStorage.storeIfAddAuthResponse(request, response, requestUrl);
         EasyCodefLogger.logResponseStatus(response);

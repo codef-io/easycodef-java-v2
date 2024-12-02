@@ -8,6 +8,9 @@ public enum CodefReferenceUrl {
     TECH_INQUIRY("https://codef.io/cs/inquiry"),
     MULTIPLE_REQUEST("https://developer.codef.io/common-guide/multiple-requests"),
 
+    WIKI_002(
+            "https://github.com/codef-io/easycodef-java-v2/wiki/002.-%EC%8B%9C%ED%81%AC%EB%A6%BF-%ED%82%A4-%EA%B8%B0%EB%B0%98-EasyCodef-%EA%B0%9D%EC%B2%B4-%EC%83%9D%EC%84%B1"
+    ),
     WIKI_003(
         "https://github.com/codef-io/easycodef-java-v2/wiki/003.-%EC%83%81%ED%92%88-%EC%9A%94%EC%B2%AD-%EA%B0%9D%EC%B2%B4-%EC%83%9D%EC%84%B1"
     ),
