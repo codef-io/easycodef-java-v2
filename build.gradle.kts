@@ -66,16 +66,16 @@ mavenPublishing {
 
 dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
-    implementation("com.alibaba:fastjson:2.0.54")
     implementation("commons-codec:commons-codec:1.18.0")
+    implementation("com.alibaba:fastjson:2.0.56")
 
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.4.1")
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.4.2")
     implementation("ch.qos.logback:logback-classic:1.5.16")
     implementation("ch.qos.logback:logback-core:1.5.16")
     implementation("org.slf4j:slf4j-api:2.0.16")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.4")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.4")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.12.0")
 }
 
 
