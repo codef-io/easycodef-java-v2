@@ -69,7 +69,7 @@ dependencies {
     implementation("com.alibaba:fastjson:2.0.56")
     implementation("commons-codec:commons-codec:1.17.2")
 
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.4.1")
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.4.2")
     implementation("ch.qos.logback:logback-classic:1.5.16")
     implementation("ch.qos.logback:logback-core:1.5.16")
     implementation("org.slf4j:slf4j-api:2.0.16")
