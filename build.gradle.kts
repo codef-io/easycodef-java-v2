@@ -67,7 +67,7 @@ mavenPublishing {
 dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.1")
     implementation("com.alibaba:fastjson:2.0.53")
-    implementation("commons-codec:commons-codec:1.17.1")
+    implementation("commons-codec:commons-codec:1.18.0")
 
 
     implementation("org.apache.httpcomponents.client5:httpclient5:5.4.1")
